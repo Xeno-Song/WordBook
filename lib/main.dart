@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:word_book/View/card_manage.dart';
 import 'package:word_book/View/main.dart';
 
 void main() {
@@ -117,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
         ),
       ),
-      body: MainView(contentHeight: bodyHeight),
+      body: CardManageView(contentHeight: bodyHeight),
       //floatingActionButton: FloatingActionButton(
       //  onPressed: _incrementCounter,
       //  tooltip: 'Increment',
