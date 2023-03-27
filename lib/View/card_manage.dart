@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:word_book/main.dart';
 import 'package:word_book/model/WordModel.dart';
 
 import '../model/WordSetModel.dart';
@@ -8,8 +7,9 @@ import '../services/wordset_service.dart';
 class CardManageView extends StatefulWidget {
   CardManageView({super.key, required this.contentHeight});
   final double contentHeight;
-
   final WordSetService _service = WordSetService();
+
+  bool _isAdding = false;
 
   @override
   State<StatefulWidget> createState() {
@@ -22,16 +22,88 @@ class _CardManageViewPageState extends State<CardManageView> {
   Widget build(BuildContext context) {
     widget._service.insertWord(WordModel(0, "AA", "aa", "AA"));
 
-    return Container(
-      color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
-      height: double.infinity,
-      width: double.infinity,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: CardManageItemBuilder(
-          service: widget._service,
-        ),
+    List<Widget> contents = <Widget>[];
+    contents.add(SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: CardManageItemBuilder(
+        service: widget._service,
       ),
+    ));
+    contents.add(const CardAddPopupScreen());
+    if (widget._isAdding) {
+      // contents.add(Container(
+      //   decoration: const BoxDecoration(
+      //     color: Colors.black45,
+      //   ),
+      //   child: const Center(
+      //     child: Text(""),
+      //   ),
+      // ));
+      // contents.add(Positioned(
+      //   top: 20,
+      //   left: 20,
+      //   bottom: 20,
+      //   right: 20,
+      //   child: Container(
+      //     decoration: BoxDecoration(
+      //       color: Colors.white,
+      //       borderRadius: BorderRadius.circular(20),
+      //     ),
+      //     child: const Text("AAAA"),
+      //   ),
+      // ));
+    }
+
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      return Scaffold(
+        body: Container(
+          color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
+          height: double.infinity,
+          width: double.infinity,
+          child: Stack(
+            children: contents,
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              widget._isAdding = true;
+            });
+          },
+          tooltip: 'Create New',
+          child: const Icon(Icons.add),
+        ), // This trailing comma makes auto-formatting nicer for build methods.
+      );
+    });
+  }
+}
+
+class CardAddPopupScreen extends StatefulWidget {
+  const CardAddPopupScreen({super.key});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _CardAddPopupScreenState();
+  }
+}
+
+class _CardAddPopupScreenState extends State<CardAddPopupScreen> {
+  final _wordSetNameTextEditingController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      title: const Text('Select assignment'),
+      children: <Widget>[
+        SimpleDialogOption(
+          onPressed: () {},
+          child: const Text('Treasury department'),
+        ),
+        SimpleDialogOption(
+          onPressed: () {},
+          child: const Text('State department'),
+        ),
+      ],
     );
   }
 }
