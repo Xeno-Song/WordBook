@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:word_book/main.dart';
+import 'package:word_book/model/WordModel.dart';
 
 import '../model/WordSetModel.dart';
 import '../services/wordset_service.dart';
 
 class CardManageView extends StatefulWidget {
-  const CardManageView({super.key, required this.contentHeight});
-
+  CardManageView({super.key, required this.contentHeight});
   final double contentHeight;
+
+  final WordSetService _service = WordSetService();
 
   @override
   State<StatefulWidget> createState() {
@@ -18,14 +20,16 @@ class CardManageView extends StatefulWidget {
 class _CardManageViewPageState extends State<CardManageView> {
   @override
   Widget build(BuildContext context) {
+    widget._service.insertWord(WordModel(0, "AA", "aa", "AA"));
+
     return Container(
       color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
       height: double.infinity,
       width: double.infinity,
-      child: const SingleChildScrollView(
+      child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: CardManageItemBuilder(
-          service: WordSetService(),
+          service: widget._service,
         ),
       ),
     );
