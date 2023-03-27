@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:word_book/main.dart';
 
+import '../model/WordSetModel.dart';
+import '../services/wordset_service.dart';
+
 class CardManageView extends StatefulWidget {
   const CardManageView({super.key, required this.contentHeight});
 
@@ -22,7 +25,7 @@ class _CardManageViewPageState extends State<CardManageView> {
       child: const SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: CardManageItemBuilder(
-          itemCount: 10,
+          service: WordSetService(),
         ),
       ),
     );
@@ -30,8 +33,10 @@ class _CardManageViewPageState extends State<CardManageView> {
 }
 
 class CardManageItemBuilder extends StatefulWidget {
-  const CardManageItemBuilder({super.key, this.itemCount});
+  const CardManageItemBuilder({super.key, this.itemCount, this.wordSet, required this.service});
   final int? itemCount;
+  final List<WordSetModel>? wordSet;
+  final WordSetService service;
 
   @override
   State<StatefulWidget> createState() {
@@ -42,15 +47,20 @@ class CardManageItemBuilder extends StatefulWidget {
 class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
   @override
   Widget build(BuildContext context) {
+    var data = widget.service?.getDummyData();
     var list = <Widget>[];
-    for (int i = 0; i < widget.itemCount!; ++i) {
+
+    for (int i = 0; i < data!.length; ++i) {
+      var dataIndex = data[i];
+      var wordCount = dataIndex.words.length;
+
       list.add(
         Material(
           color: Colors.transparent,
           child: ListTile(
             onTap: () {},
-            title: const Text("Word Set #1"),
-            subtitle: const Text("256 words"),
+            title: Text(dataIndex.name),
+            subtitle: Text("$wordCount words"),
             textColor: Colors.white,
             leading: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
