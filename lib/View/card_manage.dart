@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:word_book/View/components/common/appbar.dart';
 import 'package:word_book/View/wordset_creation.dart';
 import 'package:word_book/model/WordModel.dart';
 
 import '../model/WordSetModel.dart';
 import '../services/wordset_service.dart';
+import 'components/common/drawer.dart';
 
 class CardManageView extends StatefulWidget {
-  CardManageView({super.key, required this.contentHeight});
-  final double contentHeight;
+  CardManageView({super.key});
   final WordSetService _service = WordSetService();
 
   @override
@@ -38,6 +39,8 @@ class _CardManageViewPageState extends State<CardManageView> {
 
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return Scaffold(
+        drawer: const ApplicationDrawer(),
+        appBar: CommonAppBar.build(),
         body: Container(
           color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
           height: double.infinity,
