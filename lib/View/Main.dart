@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:word_book/View/components/common/colors.dart';
 import 'package:word_book/main.dart';
 
-class MainView extends StatefulWidget {
-  const MainView({super.key, required this.contentHeight});
+import 'components/common/appbar.dart';
+import 'components/common/drawer.dart';
 
-  final double contentHeight;
+class MainView extends StatefulWidget {
+  const MainView({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -17,10 +19,19 @@ class MainView extends StatefulWidget {
 class _MainViewPageState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: const ApplicationDrawer(),
+      appBar: CommonAppBar.build(),
+      body: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final double cellSize = screenSize.width;
     final int crossAxisCount = screenSize.width ~/ cellSize;
-    final double childAspectRatio = cellSize / (widget.contentHeight);
+    final double bodyHeight = screenSize.height - 50;
+    final double childAspectRatio = cellSize / (bodyHeight);
 
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       if (constraints.maxHeight > 300) {
@@ -30,13 +41,14 @@ class _MainViewPageState extends State<MainView> {
           children: <Widget>[
             DecoratedBox(
               decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(0),
-                  border: Border.all(
-                    width: 1,
-                    color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
-                  ),
-                  color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F)),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(0),
+                border: Border.all(
+                  width: 1,
+                  color: CommonColors.primaryBackgroundColor,
+                ),
+                color: CommonColors.primaryBackgroundColor,
+              ),
               child: Column(
                 children: [
                   Expanded(
@@ -47,7 +59,7 @@ class _MainViewPageState extends State<MainView> {
                         decoration: BoxDecoration(
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.circular(12),
-                          color: const Color.fromARGB(0xFF, 0x24, 0x22, 0x28),
+                          color: CommonColors.secondaryBackgroundColor,
                           boxShadow: [
                             BoxShadow(
                               color: const Color.fromARGB(0x26, 0, 0, 0),
@@ -68,7 +80,7 @@ class _MainViewPageState extends State<MainView> {
                                 child: const Text(
                                   "오늘의 단어",
                                   style: TextStyle(
-                                    color: Color.fromARGB(0xb2, 0xe5, 0xe1, 0xe5),
+                                    color: CommonColors.primaryForegroundColor,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -77,7 +89,7 @@ class _MainViewPageState extends State<MainView> {
                             Container(
                               height: 3,
                               decoration: const BoxDecoration(
-                                color: Color.fromARGB(0xb2, 0xe5, 0xe1, 0xe5),
+                                color: CommonColors.primaryForegroundColor,
                               ),
                             ),
                             Expanded(
@@ -86,7 +98,7 @@ class _MainViewPageState extends State<MainView> {
                                 child: const Text(
                                   "彼女\n그녀",
                                   style: TextStyle(
-                                    color: Color.fromARGB(0xb2, 0xe5, 0xe1, 0xe5),
+                                    color: CommonColors.primaryForegroundColor,
                                     fontSize: 40,
                                   ),
                                 ),

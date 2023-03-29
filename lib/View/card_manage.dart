@@ -26,7 +26,7 @@ class _CardManageViewPageState extends State<CardManageView> {
     Widget content;
 
     if (_isAdding) {
-      content = const WordSetCreationView();
+      content = WordSetCreationView();
     } else {
       content = SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -47,7 +47,10 @@ class _CardManageViewPageState extends State<CardManageView> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             setState(() {
-              _isAdding = true;
+              // _isAdding = true;
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => WordSetCreationView()),
+              );
             });
           },
           tooltip: 'Create New',
