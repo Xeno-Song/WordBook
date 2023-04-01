@@ -3,7 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:word_book/View/components/common/colors.dart';
 import 'package:word_book/main.dart';
+import 'package:word_book/model/WordTestModel.dart';
+import 'package:word_book/services/database_service.dart';
 
+import '../model/WordModel.dart';
+import '../services/word_service.dart';
 import 'components/common/appbar.dart';
 import 'components/common/drawer.dart';
 
@@ -19,6 +23,31 @@ class MainView extends StatefulWidget {
 class _MainViewPageState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
+    // WordModel model = WordModel(
+    //   0,
+    //   "this.word",
+    //   "this.meaning",
+    //   "this.pronunciation",
+    //   List<WordTestModel>.filled(3, WordTestModel(0, "OK", DateTime.now())),
+    //   DateTime.now(),
+    //   DateTime.now(),
+    //   DateTime.now(),
+    // );
+    // print(model.toMap());
+
+    // WordService service = WordService();
+    // service.insertModel(WordModel(
+    //   0,
+    //   "AA",
+    //   "meaning",
+    //   "pronunciation",
+    //   List<WordTestModel>.empty(),
+    //   DateTime.now(),
+    //   DateTime.now(),
+    //   DateTime.now(),
+    // ));
+    // WordService service = WordService();
+
     return Scaffold(
       drawer: const ApplicationDrawer(),
       appBar: CommonAppBar.build(),

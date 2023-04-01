@@ -22,7 +22,7 @@ class _CardManageViewPageState extends State<CardManageView> {
 
   @override
   Widget build(BuildContext context) {
-    widget._service.insertWord(WordModel(0, "AA", "aa", "AA"));
+    // widget._service.insertWord(WordModel(0, "AA", "aa", "AA"));
 
     Widget content;
 
