@@ -13,7 +13,7 @@ class WordService {
     );
   }
 
-  Future<List<WordModel>> getModel() async {
+  Future<List<WordModel>> getAll() async {
     var connection = await DatabaseService.database;
     var raw = await connection.query(
       _tableName,
@@ -26,8 +26,6 @@ class WordService {
     var connection = await DatabaseService.database;
     var dataMap = model.toMap();
     dataMap.remove('id');
-
-    print(dataMap);
 
     connection.insert(
       _tableName,

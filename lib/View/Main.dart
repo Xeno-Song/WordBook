@@ -35,19 +35,6 @@ class _MainViewPageState extends State<MainView> {
     // );
     // print(model.toMap());
 
-    // WordService service = WordService();
-    // service.insertModel(WordModel(
-    //   0,
-    //   "AA",
-    //   "meaning",
-    //   "pronunciation",
-    //   List<WordTestModel>.empty(),
-    //   DateTime.now(),
-    //   DateTime.now(),
-    //   DateTime.now(),
-    // ));
-    // WordService service = WordService();
-
     return Scaffold(
       drawer: const ApplicationDrawer(),
       appBar: CommonAppBar.build(),

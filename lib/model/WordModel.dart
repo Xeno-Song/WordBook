@@ -49,17 +49,24 @@ class WordModel {
   }
 
   static WordModel fromMap(Map<String, Object?> map) {
+    // print(int.parse(map['id'].toString()));
+    // print(map['word'].toString());
+    // print(map['meaning'].toString());
+    // print(map['pronunciation'].toString());
+    // print(WordTestModel.fromJson((map['testResult'].toString())));
+    // print(DateTimeFormatter.parse(map['createDate'].toString()));
+    // print(DateTimeFormatter.parse(map['modifyDate'].toString()));
+    // print(DateTimeFormatter.parse(map['nextTestData'].toString()));
+
     return WordModel(
-      (map['id'] == null) ? int.parse(map['id'].toString()) : 0,
-      (map['word'] == null) ? map['word'].toString() : "",
-      (map['meaning'] == null) ? map['meaning'].toString() : "",
-      (map['pronunciation'] == null) ? map['pronunciation'].toString() : "",
-      WordTestModel.fromJson((map['testResult'] == null) ? map['testResult'].toString() : ""),
-      (map['createDate'] == null) ? DateTimeFormatter.parse(map['createDate'].toString()) : DateTime(0, 0, 0, 0, 0, 0),
-      (map['modifyDate'] == null) ? DateTimeFormatter.parse(map['modifyDate'].toString()) : DateTime(0, 0, 0, 0, 0, 0),
-      (map['nextTestDate'] == null)
-          ? DateTimeFormatter.parse(map['nextTestDate'].toString())
-          : DateTime(0, 0, 0, 0, 0, 0),
+      int.parse(map['id'].toString()),
+      map['word'].toString(),
+      map['meaning'].toString(),
+      map['pronunciation'].toString(),
+      WordTestModel.fromJson((map['testResult'].toString())),
+      DateTimeFormatter.parse(map['createDate'].toString()),
+      DateTimeFormatter.parse(map['modifyDate'].toString()),
+      DateTimeFormatter.parse(map['nextTestDate'].toString()),
     );
   }
 }

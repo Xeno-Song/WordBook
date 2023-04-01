@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:word_book/View/components/common/appbar.dart';
 import 'package:word_book/View/wordset_creation.dart';
 import 'package:word_book/model/WordModel.dart';
+import 'package:word_book/model/WordTestModel.dart';
 
-import '../model/WordSetModel.dart';
-import '../services/wordset_service.dart';
+import '../services/word_service.dart';
 import 'components/common/drawer.dart';
 
 class CardManageView extends StatefulWidget {
   CardManageView({super.key});
-  final WordSetService _service = WordSetService();
+  final WordService _service = WordService();
 
   @override
   State<StatefulWidget> createState() {
@@ -51,9 +51,19 @@ class _CardManageViewPageState extends State<CardManageView> {
           onPressed: () {
             setState(() {
               // _isAdding = true;
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => WordSetCreationView()),
-              );
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(builder: (_) => WordSetCreationView()),
+              // );
+              widget._service.insertModel(WordModel(
+                0,
+                "word",
+                "meaning",
+                "pronunciation",
+                List<WordTestModel>.empty(),
+                DateTime.now(),
+                DateTime.now(),
+                DateTime.now(),
+              ));
             });
           },
           tooltip: 'Create New',
@@ -67,8 +77,8 @@ class _CardManageViewPageState extends State<CardManageView> {
 class CardManageItemBuilder extends StatefulWidget {
   const CardManageItemBuilder({super.key, this.itemCount, this.wordSet, required this.service});
   final int? itemCount;
-  final List<WordSetModel>? wordSet;
-  final WordSetService service;
+  final List<WordService>? wordSet;
+  final WordService service;
 
   @override
   State<StatefulWidget> createState() {
@@ -79,10 +89,23 @@ class CardManageItemBuilder extends StatefulWidget {
 class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
   @override
   Widget build(BuildContext context) {
-    var data = widget.service?.getDummyData();
+    return FutureBuilder<List<WordModel>>(
+        future: widget.service?.getAll(),
+        builder: (context, AsyncSnapshot<List<WordModel>> snapshot) {
+          if (snapshot.hasData) {
+            return _buildWordList(snapshot.data!);
+          } else {
+            return const Center(
+              child: Text("Loading.."),
+            );
+          }
+        });
+
+    /*
+    var data = widget.service?.getAll();
     var list = <Widget>[];
 
-    for (int i = 0; i < data!.length; ++i) {
+    for (int i = 0; i < data!.; ++i) {
       var dataIndex = data[i];
       var wordCount = dataIndex.words.length;
 
@@ -120,6 +143,7 @@ class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
       );
     }
 
+
     // return ListView.builder(
     //   itemCount: widget.itemCount,
     //   itemBuilder: (BuildContext context, int index) {
@@ -143,6 +167,54 @@ class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
     //     );
     //   },
     // );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: list,
+    );
+
+     */
+  }
+
+  Widget _buildWordList(List<WordModel> data) {
+    var list = <Widget>[];
+
+    for (int i = 0; i < data.length; ++i) {
+      var dataIndex = data[i];
+
+      list.add(
+        Material(
+          color: Colors.transparent,
+          child: ListTile(
+            onTap: () {},
+            title: Text(dataIndex.word),
+            subtitle: Text(dataIndex.meaning),
+            textColor: Colors.white,
+            leading: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.copy,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+            trailing: PopupMenuButton(
+              color: Colors.white,
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                const PopupMenuItem(
+                  textStyle: TextStyle(
+                    color: Colors.red,
+                  ),
+                  child: Text('Delete'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
