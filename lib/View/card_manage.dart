@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:word_book/View/components/common/appbar.dart';
-import 'package:word_book/View/wordset_creation.dart';
+import 'package:word_book/View/components/common/colors.dart';
 import 'package:word_book/model/WordModel.dart';
 import 'package:word_book/model/WordTestModel.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../services/word_service.dart';
 import 'components/common/drawer.dart';
@@ -10,6 +11,8 @@ import 'components/common/drawer.dart';
 class CardManageView extends StatefulWidget {
   CardManageView({super.key});
   final WordService _service = WordService();
+  int currentPage = 1;
+  int maxPage = 10;
 
   @override
   State<StatefulWidget> createState() {
@@ -18,25 +21,23 @@ class CardManageView extends StatefulWidget {
 }
 
 class _CardManageViewPageState extends State<CardManageView> {
-  bool _isAdding = false;
+  @override
+  void initState() {
+    super.initState();
+    updateMaxPage();
+  }
+
+  void updateMaxPage() {
+    widget._service.getAllCount().then((int count) {
+      setState(() {
+        widget.maxPage = ((count / 100) + 1).toInt();
+        // print("Total Count : $count / Pages : ${widget.maxPage}");
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // widget._service.insertWord(WordModel(0, "AA", "aa", "AA"));
-
-    Widget content;
-
-    if (_isAdding) {
-      content = WordSetCreationView();
-    } else {
-      content = SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: CardManageItemBuilder(
-          service: widget._service,
-        ),
-      );
-    }
-
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return Scaffold(
         drawer: const ApplicationDrawer(),
@@ -45,7 +46,58 @@ class _CardManageViewPageState extends State<CardManageView> {
           color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
           height: double.infinity,
           width: double.infinity,
-          child: content,
+          child: Column(
+            children: [
+              Expanded(
+                child: CardManageItemBuilder(
+                  service: widget._service,
+                  offset: (widget.currentPage - 1) * 100,
+                  count: 100,
+                ),
+              ),
+              SizedBox(
+                height: 50,
+                width: double.maxFinite,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () => {
+                        setState(
+                          () {
+                            if (widget.currentPage > 1) widget.currentPage--;
+                          },
+                        )
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: CommonColors.secondaryBackgroundColor,
+                      ),
+                      child: const Text("<"),
+                    ),
+                    Text(
+                      "    ${widget.currentPage} / ${widget.maxPage}    ",
+                      style: const TextStyle(
+                        color: CommonColors.primaryForegroundColor,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => {
+                        setState(
+                          () {
+                            if (widget.currentPage < widget.maxPage) widget.currentPage++;
+                          },
+                        )
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: CommonColors.secondaryBackgroundColor,
+                      ),
+                      child: const Text(">"),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -54,16 +106,18 @@ class _CardManageViewPageState extends State<CardManageView> {
               // Navigator.of(context).push(
               //   MaterialPageRoute(builder: (_) => WordSetCreationView()),
               // );
-              widget._service.insertModel(WordModel(
-                0,
-                "word",
-                "meaning",
-                "pronunciation",
-                List<WordTestModel>.empty(),
-                DateTime.now(),
-                DateTime.now(),
-                DateTime.now(),
-              ));
+              for (int i = 0; i < 10000; ++i) {
+                widget._service.insertModel(WordModel(
+                  0,
+                  "word_$i",
+                  "meaning_$i",
+                  "pronunciation",
+                  List<WordTestModel>.empty(),
+                  DateTime.now(),
+                  DateTime.now(),
+                  DateTime.now(),
+                ));
+              }
             });
           },
           tooltip: 'Create New',
@@ -75,8 +129,10 @@ class _CardManageViewPageState extends State<CardManageView> {
 }
 
 class CardManageItemBuilder extends StatefulWidget {
-  const CardManageItemBuilder({super.key, this.itemCount, this.wordSet, required this.service});
-  final int? itemCount;
+  const CardManageItemBuilder(
+      {super.key, required this.offset, required this.count, this.wordSet, required this.service});
+  final int offset;
+  final int count;
   final List<WordService>? wordSet;
   final WordService service;
 
@@ -90,13 +146,15 @@ class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<WordModel>>(
-        future: widget.service?.getAll(),
+        future: widget.service.getDataLimit(widget.offset, widget.count),
         builder: (context, AsyncSnapshot<List<WordModel>> snapshot) {
           if (snapshot.hasData) {
             return _buildWordList(snapshot.data!);
           } else {
-            return const Center(
-              child: Text("Loading.."),
+            return const SpinKitFoldingCube(
+              color: Colors.white,
+              duration: Duration(seconds: 4),
+              size: 50.0,
             );
           }
         });
@@ -216,9 +274,12 @@ class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: list,
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: list,
+      ),
     );
   }
 }
