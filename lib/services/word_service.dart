@@ -53,6 +53,16 @@ class WordService {
     return int.parse(rawResult[0]["COUNT(*)"].toString());
   }
 
+  Future<bool> remove(WordModel model) async {
+    var connection = await DatabaseService.database;
+    var rawResult = await connection.delete(
+      _tableName,
+      where: "id = ${model.id} AND word = '${model.word}'",
+    );
+
+    return rawResult == 1;
+  }
+
   // List<WordModel> getWord()
   // {
   //   _collection.get

@@ -9,10 +9,10 @@ import '../services/word_service.dart';
 import 'components/common/drawer.dart';
 
 class CardManageView extends StatefulWidget {
-  CardManageView({super.key});
+  CardManageView({super.key, this.itemPerPage = 100});
   final WordService _service = WordService();
-  int currentPage = 1;
-  int maxPage = 10;
+
+  final int? itemPerPage;
 
   @override
   State<StatefulWidget> createState() {
@@ -21,6 +21,9 @@ class CardManageView extends StatefulWidget {
 }
 
 class _CardManageViewPageState extends State<CardManageView> {
+  int currentPage = 1;
+  int maxPage = 1;
+
   @override
   void initState() {
     super.initState();
@@ -30,10 +33,25 @@ class _CardManageViewPageState extends State<CardManageView> {
   void updateMaxPage() {
     widget._service.getAllCount().then((int count) {
       setState(() {
-        widget.maxPage = ((count / 100) + 1).toInt();
+        maxPage = ((count / 100) + (count % 100 == 0 ? 0 : 1)).toInt();
+        if (currentPage > maxPage) currentPage = maxPage;
         // print("Total Count : $count / Pages : ${widget.maxPage}");
       });
     });
+  }
+
+  void handleAppbarAction(String menu) {
+    print("App bar action handled : $menu");
+  }
+
+  void handleWordItemTrailingMenuTap(WordModel model, String value) {
+    if (value == "delete") deleteWord(model);
+  }
+
+  void deleteWord(WordModel model) {
+    widget._service.remove(model).then((value) => setState(() {
+          updateMaxPage();
+        }));
   }
 
   @override
@@ -41,7 +59,21 @@ class _CardManageViewPageState extends State<CardManageView> {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return Scaffold(
         drawer: const ApplicationDrawer(),
-        appBar: CommonAppBar.build(),
+        appBar: CommonAppBar.build(
+          <Widget>[
+            PopupMenuButton<String>(
+              onSelected: handleAppbarAction,
+              itemBuilder: (BuildContext context) {
+                return {'Add'}.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            ),
+          ],
+        ),
         body: Container(
           color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
           height: double.infinity,
@@ -51,8 +83,9 @@ class _CardManageViewPageState extends State<CardManageView> {
               Expanded(
                 child: CardManageItemBuilder(
                   service: widget._service,
-                  offset: (widget.currentPage - 1) * 100,
+                  offset: (currentPage - 1) * 100,
                   count: 100,
+                  onTrailingTap: handleWordItemTrailingMenuTap,
                 ),
               ),
               SizedBox(
@@ -65,7 +98,7 @@ class _CardManageViewPageState extends State<CardManageView> {
                       onPressed: () => {
                         setState(
                           () {
-                            if (widget.currentPage > 1) widget.currentPage--;
+                            if (currentPage > 1) currentPage--;
                           },
                         )
                       },
@@ -75,7 +108,7 @@ class _CardManageViewPageState extends State<CardManageView> {
                       child: const Text("<"),
                     ),
                     Text(
-                      "    ${widget.currentPage} / ${widget.maxPage}    ",
+                      "    $currentPage / $maxPage    ",
                       style: const TextStyle(
                         color: CommonColors.primaryForegroundColor,
                       ),
@@ -84,7 +117,7 @@ class _CardManageViewPageState extends State<CardManageView> {
                       onPressed: () => {
                         setState(
                           () {
-                            if (widget.currentPage < widget.maxPage) widget.currentPage++;
+                            if (currentPage < maxPage) currentPage++;
                           },
                         )
                       },
@@ -99,30 +132,6 @@ class _CardManageViewPageState extends State<CardManageView> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              // _isAdding = true;
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(builder: (_) => WordSetCreationView()),
-              // );
-              for (int i = 0; i < 10000; ++i) {
-                widget._service.insertModel(WordModel(
-                  0,
-                  "word_$i",
-                  "meaning_$i",
-                  "pronunciation",
-                  List<WordTestModel>.empty(),
-                  DateTime.now(),
-                  DateTime.now(),
-                  DateTime.now(),
-                ));
-              }
-            });
-          },
-          tooltip: 'Create New',
-          child: const Icon(Icons.add),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
       );
     });
   }
@@ -130,11 +139,12 @@ class _CardManageViewPageState extends State<CardManageView> {
 
 class CardManageItemBuilder extends StatefulWidget {
   const CardManageItemBuilder(
-      {super.key, required this.offset, required this.count, this.wordSet, required this.service});
+      {super.key, required this.offset, required this.count, this.wordSet, required this.service, this.onTrailingTap});
   final int offset;
   final int count;
   final List<WordService>? wordSet;
   final WordService service;
+  final Function(WordModel model, String value)? onTrailingTap;
 
   @override
   State<StatefulWidget> createState() {
@@ -146,92 +156,19 @@ class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<WordModel>>(
-        future: widget.service.getDataLimit(widget.offset, widget.count),
-        builder: (context, AsyncSnapshot<List<WordModel>> snapshot) {
-          if (snapshot.hasData) {
-            return _buildWordList(snapshot.data!);
-          } else {
-            return const SpinKitFoldingCube(
-              color: Colors.white,
-              duration: Duration(seconds: 4),
-              size: 50.0,
-            );
-          }
-        });
-
-    /*
-    var data = widget.service?.getAll();
-    var list = <Widget>[];
-
-    for (int i = 0; i < data!.; ++i) {
-      var dataIndex = data[i];
-      var wordCount = dataIndex.words.length;
-
-      list.add(
-        Material(
-          color: Colors.transparent,
-          child: ListTile(
-            onTap: () {},
-            title: Text(dataIndex.name),
-            subtitle: Text("$wordCount words"),
-            textColor: Colors.white,
-            leading: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(
-                  Icons.copy,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-            trailing: PopupMenuButton(
-              color: Colors.white,
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                const PopupMenuItem(
-                  textStyle: TextStyle(
-                    color: Colors.red,
-                  ),
-                  child: Text('Delete'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-
-    // return ListView.builder(
-    //   itemCount: widget.itemCount,
-    //   itemBuilder: (BuildContext context, int index) {
-    //     return Material(
-    //       color: Colors.transparent,
-    //       child: ListTile(
-    //         onTap: () {},
-    //         title: const Text("Word Set #1"),
-    //         textColor: Colors.white,
-    //         leading: Column(
-    //           crossAxisAlignment: CrossAxisAlignment.center,
-    //           mainAxisAlignment: MainAxisAlignment.center,
-    //           children: const [
-    //             Icon(
-    //               Icons.copy,
-    //               color: Colors.white,
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     );
-    //   },
-    // );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: list,
+      future: widget.service.getDataLimit(widget.offset, widget.count),
+      builder: (context, AsyncSnapshot<List<WordModel>> snapshot) {
+        if (snapshot.hasData) {
+          return _buildWordList(snapshot.data!);
+        } else {
+          return const SpinKitFoldingCube(
+            color: Colors.white,
+            duration: Duration(seconds: 4),
+            size: 50.0,
+          );
+        }
+      },
     );
-
-     */
   }
 
   Widget _buildWordList(List<WordModel> data) {
@@ -265,9 +202,11 @@ class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
                   textStyle: TextStyle(
                     color: Colors.red,
                   ),
+                  value: "delete",
                   child: Text('Delete'),
                 ),
               ],
+              onSelected: (value) => widget.onTrailingTap!(dataIndex, value),
             ),
           ),
         ),

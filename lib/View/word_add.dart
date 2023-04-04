@@ -2,30 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:word_book/View/components/common/drawer.dart';
 import 'package:word_book/View/components/text_input_field.dart';
 
-class WordSetCreationView extends StatefulWidget {
-  const WordSetCreationView({super.key});
+import 'components/common/appbar.dart';
+
+class WordAddView extends StatefulWidget {
+  const WordAddView({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _WordSetCreationViewState();
+    return _WordAddViewState();
   }
 }
 
-class _WordSetCreationViewState extends State<WordSetCreationView> {
+class _WordAddViewState extends State<WordAddView> {
   final _wordSetNameTextEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const ApplicationDrawer(),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50),
-        child: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text("AA"),
-        ),
-      ),
+      appBar: CommonAppBar.build(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
