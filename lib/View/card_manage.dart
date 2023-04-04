@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:word_book/View/components/common/appbar.dart';
 import 'package:word_book/View/components/common/colors.dart';
+import 'package:word_book/View/word_add.dart';
 import 'package:word_book/model/WordModel.dart';
 import 'package:word_book/model/WordTestModel.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -40,10 +41,6 @@ class _CardManageViewPageState extends State<CardManageView> {
     });
   }
 
-  void handleAppbarAction(String menu) {
-    print("App bar action handled : $menu");
-  }
-
   void handleWordItemTrailingMenuTap(WordModel model, String value) {
     if (value == "delete") deleteWord(model);
   }
@@ -62,7 +59,11 @@ class _CardManageViewPageState extends State<CardManageView> {
         appBar: CommonAppBar.build(
           <Widget>[
             PopupMenuButton<String>(
-              onSelected: handleAppbarAction,
+              onSelected: (value) {
+                if (value == 'Add') {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WordAddView()));
+                }
+              },
               itemBuilder: (BuildContext context) {
                 return {'Add'}.map((String choice) {
                   return PopupMenuItem<String>(
@@ -75,7 +76,7 @@ class _CardManageViewPageState extends State<CardManageView> {
           ],
         ),
         body: Container(
-          color: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
+          color: CommonColors.primaryBackgroundColor,
           height: double.infinity,
           width: double.infinity,
           child: Column(
