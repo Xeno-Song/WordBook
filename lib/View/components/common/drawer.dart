@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:word_book/View/card_manage.dart';
+import 'package:word_book/View/components/common/colors.dart';
 
 class ApplicationDrawer extends StatelessWidget {
   const ApplicationDrawer({super.key});
@@ -8,13 +9,13 @@ class ApplicationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color.fromARGB(0xFF, 0x1C, 0x1B, 0x1F),
+      backgroundColor: CommonColors.primaryBackgroundColor,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           const UserAccountsDrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.purple,
+              color: Colors.deepPurple,
             ),
             accountName: Text("Xeno.Song"),
             accountEmail: Text("H202046033@hycu.ac.kr"),

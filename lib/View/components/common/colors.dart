@@ -7,4 +7,8 @@ class CommonColors {
   static const Color secondaryBackgroundColor = Color.fromARGB(0xFF, 0x24, 0x22, 0x28);
 
   static const Color primaryForegroundColor = Color.fromARGB(0xb2, 0xe5, 0xe1, 0xe5);
+  static const Color secondaryForegroundColor = Color.fromARGB(0xFF, 0xc5, 0xc1, 0xc5);
+
+  static const Color primaryThemeColor = Colors.deepPurple;
+  static const Color primaryThemeColorBrighter = Colors.deepPurpleAccent;
 }
