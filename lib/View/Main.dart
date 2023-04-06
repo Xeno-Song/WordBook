@@ -8,6 +8,7 @@ import 'package:word_book/services/database_service.dart';
 
 import '../model/WordModel.dart';
 import '../services/word_service.dart';
+import 'card_manage.dart';
 import 'components/common/appbar.dart';
 import 'components/common/drawer.dart';
 
@@ -151,9 +152,7 @@ class _MainViewPageState extends State<MainView> {
                                     const Color.fromARGB(0xFF, 0xBC, 0xD0, 0xFF),
                                   ),
                                 ),
-                                onPressed: () {
-                                  print("Button Pressed #1");
-                                },
+                                onPressed: () {},
                                 child: const Text("Button #1"),
                               ),
                             ),
@@ -181,9 +180,15 @@ class _MainViewPageState extends State<MainView> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  print("Button Pressed #2");
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
                                 },
-                                child: const Text("Button #2"),
+                                child: const Text(
+                                  "단어 관리",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: CommonColors.primaryBackgroundColor,
+                                  ),
+                                ),
                               ),
                             ),
                           ),

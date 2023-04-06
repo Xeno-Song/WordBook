@@ -156,11 +156,13 @@ class CardManageItemBuilder extends StatefulWidget {
 class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<WordModel>>(
-      future: widget.service.getDataLimit(widget.offset, widget.count),
-      builder: (context, AsyncSnapshot<List<WordModel>> snapshot) {
+    return FutureBuilder<Widget>(
+      future: widget.service.getDataLimit(widget.offset, widget.count).then<Widget>((List<WordModel> rawValue) {
+        return _buildWordList(rawValue);
+      }),
+      builder: (context, AsyncSnapshot<Widget> snapshot) {
         if (snapshot.hasData) {
-          return _buildWordList(snapshot.data!);
+          return snapshot.data!;
         } else {
           return const SpinKitFoldingCube(
             color: Colors.white,
