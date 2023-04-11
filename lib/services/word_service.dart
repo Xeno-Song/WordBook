@@ -34,6 +34,55 @@ class WordService {
     return List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
   }
 
+  Future<List<WordModel>> getTestOutdateWord(int limit) async {
+    var connection = await DatabaseService.database;
+    var raw = await connection.query(
+      _tableName,
+      where: "nextTestData > ${DateTime.now()}",
+      orderBy: "nextTestDate ASC",
+      limit: limit,
+    );
+
+    return List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
+  }
+
+  Future<WordModel?> getNotTestedWord(int limit) async {
+    var connection = await DatabaseService.database;
+    var raw = await connection.query(
+      _tableName,
+      where: "nextTestDate = null OR nextTestDate = \"\"",
+      orderBy: "RANDOM()",
+      limit: limit,
+    );
+
+    if (raw.isEmpty) return null;
+    return WordModel.fromMap(raw[0]);
+  }
+
+  Future<List<String>> getRandomWordString(int limit, List<WordModel>? excludes) async {
+    var connection = await DatabaseService.database;
+
+    String excludeCondition = "";
+    if (excludes != null) {
+      for (var element in excludes) {
+        if (excludeCondition.isNotEmpty) {
+          excludeCondition = "$excludeCondition AND id != ${element.id}";
+        } else {
+          excludeCondition = "id != ${element.id}";
+        }
+      }
+    }
+
+    var raw = await connection.query(
+      _tableName,
+      where: excludeCondition,
+      orderBy: "RANDOM()",
+      limit: limit,
+    );
+
+    return List.generate(raw.length, (index) => raw[index]['word'].toString());
+  }
+
   Future<void> insertModel(WordModel model) async {
     var connection = await DatabaseService.database;
     var dataMap = model.toMap();

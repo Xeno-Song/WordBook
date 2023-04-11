@@ -18,7 +18,7 @@ class WordTestModel {
   }
 
   static WordTestModel fromMap(Map<String, dynamic> map) {
-    return WordTestModel(map['id'], map['result'], map['createDate']);
+    return WordTestModel(map['id'], map['result'], DateTimeFormatter.parse(map['createDate'])!);
   }
 
   static List<WordTestModel> fromJson(String data) {
@@ -27,7 +27,7 @@ class WordTestModel {
         (model['id'] == null) ? int.parse(model['id'].toString()) : 0,
         (model['result'] == null) ? model['result'].toString() : "",
         (model['createDate'] == null)
-            ? DateTimeFormatter.parse(model['createDate'].toString())
+            ? DateTimeFormatter.parse(model['createDate'].toString())!
             : DateTime(0, 0, 0, 0, 0, 0))));
   }
 }

@@ -11,7 +11,7 @@ class WordModel {
   List<WordTestModel> testResult = List<WordTestModel>.empty();
   DateTime createDate = DateTime(0, 0, 0, 0, 0, 0);
   DateTime modifyDate = DateTime(0, 0, 0, 0, 0, 0);
-  DateTime nextTestDate = DateTime(0, 0, 0, 0, 0, 0);
+  DateTime? nextTestDate = DateTime(0, 0, 0, 0, 0, 0);
 
   WordModel(
     this.id,
@@ -36,7 +36,7 @@ class WordModel {
       );
 
   Map<String, dynamic> toMap() {
-    return {
+    var map = {
       'id': id,
       'word': word,
       'meaning': meaning,
@@ -46,6 +46,9 @@ class WordModel {
       'nextTestDate': DateTimeFormatter.format(nextTestDate),
       'testResult': json.encode(List<dynamic>.generate(testResult.length, (index) => testResult[index].toMap()))
     };
+    if (nextTestDate == null) map.remove('nextTestDate');
+
+    return map;
   }
 
   static WordModel fromMap(Map<String, Object?> map) {
@@ -64,8 +67,8 @@ class WordModel {
       map['meaning'].toString(),
       map['pronunciation'].toString(),
       WordTestModel.fromJson((map['testResult'].toString())),
-      DateTimeFormatter.parse(map['createDate'].toString()),
-      DateTimeFormatter.parse(map['modifyDate'].toString()),
+      DateTimeFormatter.parse(map['createDate'].toString())!,
+      DateTimeFormatter.parse(map['modifyDate'].toString())!,
       DateTimeFormatter.parse(map['nextTestDate'].toString()),
     );
   }
