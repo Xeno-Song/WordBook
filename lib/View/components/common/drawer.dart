@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:word_book/View/card_manage.dart';
 import 'package:word_book/View/components/common/colors.dart';
+import 'package:word_book/View/flashcard.dart';
 
 class ApplicationDrawer extends StatelessWidget {
   const ApplicationDrawer({super.key});
@@ -41,7 +42,10 @@ class ApplicationDrawer extends StatelessWidget {
             ),
             title: const Text('Flash Card'),
             textColor: Colors.white70,
-            onTap: () {},
+            onTap: () {
+              _closeDrawer(context);
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => FlashcardView()));
+            },
           ),
           ListTile(
             leading: const Icon(

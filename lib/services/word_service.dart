@@ -46,7 +46,7 @@ class WordService {
     return List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
   }
 
-  Future<WordModel?> getNotTestedWord(int limit) async {
+  Future<List<WordModel>?> getNotTestedWord(int limit) async {
     var connection = await DatabaseService.database;
     var raw = await connection.query(
       _tableName,
@@ -56,7 +56,7 @@ class WordService {
     );
 
     if (raw.isEmpty) return null;
-    return WordModel.fromMap(raw[0]);
+    return List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
   }
 
   Future<List<String>> getRandomWordString(int limit, List<WordModel>? excludes) async {
