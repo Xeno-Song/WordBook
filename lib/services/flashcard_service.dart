@@ -8,9 +8,12 @@ class FlashcardService {
   Future<List<WordModel>?> getNextWord({int limit = 1}) async {
     List<WordModel> modelList = await _service.getTestOutdateWord(limit);
     if (modelList.length == limit) return modelList;
+    // print(modelList);
 
     var model = await _service.getNotTestedWord(limit - modelList.length);
-    if (model != null) modelList.addAll(model.iterator as Iterable<WordModel>);
+    if (model != null) {
+      modelList += model;
+    }
 
     // Any word was not targeted for next learning (end learning or add words more)
     return modelList;

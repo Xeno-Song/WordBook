@@ -9,7 +9,7 @@ class DateTimeFormatter {
   }
 
   static DateTime? parse(String? dateTime) {
-    if (dateTime == null || dateTime == "") return null;
+    if (dateTime == null || dateTime == "null") return null;
     return _dateFormat.parse(dateTime!);
   }
 }

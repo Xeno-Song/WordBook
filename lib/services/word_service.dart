@@ -1,5 +1,6 @@
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as Sqflite;
+import 'package:word_book/common/date_time_formatter.dart';
 
 import '../model/WordModel.dart';
 import 'database_service.dart';
@@ -38,7 +39,7 @@ class WordService {
     var connection = await DatabaseService.database;
     var raw = await connection.query(
       _tableName,
-      where: "nextTestData > ${DateTime.now()}",
+      where: "nextTestDate > '${DateTimeFormatter.format(DateTime.now())}'",
       orderBy: "nextTestDate ASC",
       limit: limit,
     );
@@ -50,7 +51,7 @@ class WordService {
     var connection = await DatabaseService.database;
     var raw = await connection.query(
       _tableName,
-      where: "nextTestDate = null OR nextTestDate = \"\"",
+      where: "nextTestDate is null OR nextTestDate = \"\"",
       orderBy: "RANDOM()",
       limit: limit,
     );
