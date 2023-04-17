@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -64,7 +65,6 @@ class FlashcardViewState extends State<FlashcardView> {
     _service.getNextWord(limit: 1).then((word) {
       _service.getRandomWordString(3, word![0]).then((value) {
         setState(() {
-          print(value);
           _waitingWords.add(FlashcardObject(word[0], value));
         });
       });
@@ -73,9 +73,22 @@ class FlashcardViewState extends State<FlashcardView> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: const ApplicationDrawer(),
+      appBar: CommonAppBar.build(),
+      body: buildBody(context),
+    );
+  }
+
+  Widget buildBody(BuildContext context) {
     if (_waitingWords.isEmpty) {
-      return const Center(
-        child: SpinKitFoldingCube(
+      print("Word is loading");
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        alignment: Alignment.center,
+        color: CommonColors.primaryBackgroundColor,
+        child: const SpinKitFoldingCube(
           color: Colors.white,
           duration: Duration(seconds: 4),
           size: 50.0,
@@ -83,44 +96,41 @@ class FlashcardViewState extends State<FlashcardView> {
       );
     }
 
-    return Scaffold(
-      drawer: const ApplicationDrawer(),
-      appBar: CommonAppBar.build(),
-      body: Container(
-        color: CommonColors.primaryBackgroundColor,
-        child: CardSwiper(
-          cardsCount: 3,
-          isLoop: true,
-          numberOfCardsDisplayed: 3,
-          onSwipe: (int a, int? b, CardSwiperDirection direction) {
-            onCardSwipe();
-            return false;
-          },
-          cardBuilder: (context, index) {
-            if (index == 0) {
-              return TestableWordCardIndex(
-                dataObject: _waitingWords[index],
-                controller: controller,
-              );
-            }
-            return DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-                color: CommonColors.secondaryBackgroundColor,
-                shape: BoxShape.rectangle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black45.withOpacity(0.55),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Container(),
+    print("Word is loaded");
+    return Container(
+      color: CommonColors.primaryBackgroundColor,
+      child: CardSwiper(
+        cardsCount: 3,
+        isLoop: true,
+        numberOfCardsDisplayed: 3,
+        onSwipe: (int a, int? b, CardSwiperDirection direction) {
+          onCardSwipe();
+          return false;
+        },
+        cardBuilder: (context, index) {
+          if (index == 0) {
+            return TestableWordCardIndex(
+              dataObject: _waitingWords[index],
+              controller: controller,
             );
-          },
-        ),
+          }
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              color: CommonColors.secondaryBackgroundColor,
+              shape: BoxShape.rectangle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black45.withOpacity(0.55),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Container(),
+          );
+        },
       ),
     );
   }
@@ -133,6 +143,7 @@ class TestableWordCardIndex extends StatefulWidget {
     this.questionOptions,
     this.onCorrectAnswer,
     this.onWrongAnswer,
+    this.onPass,
     required this.controller,
   });
 
@@ -140,6 +151,7 @@ class TestableWordCardIndex extends StatefulWidget {
   final List<String>? questionOptions;
   final Action? onCorrectAnswer;
   final Action? onWrongAnswer;
+  final Action? onPass;
   final FlipCardController controller;
 
   @override
@@ -298,7 +310,7 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> {
 
   @override
   Widget build(BuildContext context) {
-    if (false) {
+    if (widget.dataObject!.model.testResult.isEmpty) {
       return buildWordVisualizationCard();
     } else {
       return buildMultipleChoiceCard();
