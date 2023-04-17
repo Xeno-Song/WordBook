@@ -14,6 +14,16 @@ import 'package:word_book/services/flashcard_service.dart';
 import '../model/WordModel.dart';
 import 'components/common/drawer.dart';
 
+class FlashcardObject {
+  FlashcardObject(this.model, this.choices) {
+    choices = <String>[model.word] + choices;
+    choices.shuffle();
+  }
+
+  WordModel model;
+  List<String> choices;
+}
+
 class FlashcardView extends StatefulWidget {
   const FlashcardView({super.key});
 
@@ -25,7 +35,7 @@ class FlashcardView extends StatefulWidget {
 
 class FlashcardViewState extends State<FlashcardView> {
   final FlashcardService _service = FlashcardService();
-  List<WordModel> _waitingWords = List<WordModel>.empty();
+  final List<FlashcardObject> _waitingWords = <FlashcardObject>[];
   int offset = 0;
   FlipCardController controller = FlipCardController();
 
@@ -34,21 +44,30 @@ class FlashcardViewState extends State<FlashcardView> {
     super.initState();
 
     _service.getNextWord(limit: 3).then((list) {
-      setState(() {
-        _waitingWords = list!;
+      list?.forEach((element) {
+        _service.getRandomWordString(3, element).then((value) {
+          setState(() {
+            _waitingWords.add(FlashcardObject(element, value));
+          });
+        });
       });
     });
   }
 
   void onCardSwipe() {
-    WordModel model = _waitingWords[0];
+    FlashcardObject model = _waitingWords[0];
     _waitingWords.remove(model);
     setState(() {
-      controller.state!.isFront = true;
+      controller.state?.isFront = true;
     });
 
-    _service.getNextWord(limit: 1).then((list) {
-      _waitingWords += list!;
+    _service.getNextWord(limit: 1).then((word) {
+      _service.getRandomWordString(3, word![0]).then((value) {
+        setState(() {
+          print(value);
+          _waitingWords.add(FlashcardObject(word[0], value));
+        });
+      });
     });
   }
 
@@ -80,7 +99,7 @@ class FlashcardViewState extends State<FlashcardView> {
           cardBuilder: (context, index) {
             if (index == 0) {
               return TestableWordCardIndex(
-                model: _waitingWords[index],
+                dataObject: _waitingWords[index],
                 controller: controller,
               );
             }
@@ -110,14 +129,14 @@ class FlashcardViewState extends State<FlashcardView> {
 class TestableWordCardIndex extends StatefulWidget {
   const TestableWordCardIndex({
     super.key,
-    this.model,
+    this.dataObject,
     this.questionOptions,
     this.onCorrectAnswer,
     this.onWrongAnswer,
     required this.controller,
   });
 
-  final WordModel? model;
+  final FlashcardObject? dataObject;
   final List<String>? questionOptions;
   final Action? onCorrectAnswer;
   final Action? onWrongAnswer;
@@ -135,87 +154,9 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> {
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget buildWordVisualizationCard() {
     return FlipCard(
-      frontWidget: Container(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            color: CommonColors.secondaryBackgroundColor,
-            shape: BoxShape.rectangle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black45.withOpacity(0.55),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Container(
-            alignment: Alignment.center,
-            child: Text(
-              widget.model!.word,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 40,
-              ),
-            ),
-          ),
-        ),
-      ),
-      backWidget: Container(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            color: CommonColors.secondaryBackgroundColor,
-            shape: BoxShape.rectangle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black45.withOpacity(0.55),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-                child: Center(
-                  child: Text(
-                    "${widget.model!.pronunciation}",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                    ),
-                  ),
-                ),
-              ),
-              Center(
-                child: Text(
-                  widget.model!.meaning,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      controller: widget.controller,
-      rotateSide: RotateSide.left,
-      onTapFlipping: true,
-      animationDuration: const Duration(milliseconds: 300),
-    ); /*AnimatedSize(
-      duration: const Duration(seconds: 1),
-      child: DecoratedBox(
+      frontWidget: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
           color: CommonColors.secondaryBackgroundColor,
@@ -231,9 +172,186 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> {
         ),
         child: Container(
           alignment: Alignment.center,
-          child: ,
+          child: Text(
+            widget.dataObject!.model.word,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 40,
+            ),
+          ),
         ),
       ),
-    );*/
+      backWidget: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          color: CommonColors.secondaryBackgroundColor,
+          shape: BoxShape.rectangle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black45.withOpacity(0.55),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+              child: Center(
+                child: Text(
+                  widget.dataObject!.model.pronunciation,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                  ),
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                widget.dataObject!.model.meaning,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 30,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      controller: widget.controller,
+      rotateSide: RotateSide.left,
+      onTapFlipping: true,
+      animationDuration: const Duration(milliseconds: 300),
+    );
+  }
+
+  Widget buildMultipleChoiceCard() {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.0),
+        color: CommonColors.secondaryBackgroundColor,
+        shape: BoxShape.rectangle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black45.withOpacity(0.55),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: double.infinity,
+        child: Flex(
+          direction: Axis.vertical,
+          children: [
+            Flexible(
+              flex: 5,
+              child: Center(
+                child: Text(
+                  widget.dataObject!.model.word,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 40,
+                  ),
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              child: ChoiceButton(
+                text: widget.dataObject!.choices[0],
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              child: ChoiceButton(
+                text: widget.dataObject!.choices[1],
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              child: ChoiceButton(
+                text: widget.dataObject!.choices[2],
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                child: ChoiceButton(
+                  text: widget.dataObject!.choices[3],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (false) {
+      return buildWordVisualizationCard();
+    } else {
+      return buildMultipleChoiceCard();
+    }
+  }
+}
+
+class ChoiceButton extends StatefulWidget {
+  const ChoiceButton({
+    super.key,
+    required this.text,
+    this.onPressed,
+  });
+
+  final String? text;
+  final Function()? onPressed;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _ChoiceButtonState();
+  }
+}
+
+class _ChoiceButtonState extends State<ChoiceButton> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      width: double.infinity,
+      height: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(50, 20, 20, 20),
+            elevation: 20,
+            shadowColor: Colors.black38,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            side: const BorderSide(
+              color: Colors.white54,
+            ),
+          ),
+          onPressed: () => widget.onPressed?.call(),
+          child: Container(
+            alignment: Alignment.center,
+            width: double.infinity,
+            height: double.infinity,
+            child: Text(widget.text!),
+          ),
+        ),
+      ),
+    );
   }
 }
