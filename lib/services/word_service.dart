@@ -39,7 +39,8 @@ class WordService {
     var connection = await DatabaseService.database;
     var raw = await connection.query(
       _tableName,
-      where: "nextTestDate > '${DateTimeFormatter.format(DateTime.now())}'",
+      where: "nextTestDate < ?",
+      whereArgs: [DateTimeFormatter.format(DateTime.now())],
       orderBy: "nextTestDate ASC",
       limit: limit,
     );
@@ -111,6 +112,18 @@ class WordService {
     );
 
     return rawResult == 1;
+  }
+
+  Future<bool> update(int id, WordModel model) async {
+    var connection = await DatabaseService.database;
+    await connection.update(
+      _tableName,
+      model.toMap(),
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    return true;
   }
 
   // List<WordModel> getWord()

@@ -10,6 +10,8 @@ import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:word_book/View/components/common/appbar.dart';
 import 'package:word_book/View/components/common/colors.dart';
+import 'package:word_book/common/date_time_formatter.dart';
+import 'package:word_book/model/WordTestModel.dart';
 import 'package:word_book/services/flashcard_service.dart';
 
 import '../model/WordModel.dart';
@@ -19,10 +21,15 @@ class FlashcardObject {
   FlashcardObject(this.model, this.choices) {
     choices = <String>[model.word] + choices;
     choices.shuffle();
+
+    testable = model.testResult.isNotEmpty;
+    tested = false;
   }
 
   WordModel model;
   List<String> choices;
+  bool testable = false;
+  bool tested = false;
 }
 
 class FlashcardView extends StatefulWidget {
@@ -62,6 +69,12 @@ class FlashcardViewState extends State<FlashcardView> {
       controller.state?.isFront = true;
     });
 
+    if (!model.testable) {
+      model.model.testResult.add(WordTestModel(0, "PASS", DateTime.now()));
+      model.model.nextTestDate = DateTime.now().add(const Duration(minutes: 5));
+      _service.updateTestResult(model.model);
+    }
+
     _service.getNextWord(limit: 1).then((word) {
       _service.getRandomWordString(3, word![0]).then((value) {
         setState(() {
@@ -82,7 +95,6 @@ class FlashcardViewState extends State<FlashcardView> {
 
   Widget buildBody(BuildContext context) {
     if (_waitingWords.isEmpty) {
-      print("Word is loading");
       return Container(
         width: double.infinity,
         height: double.infinity,
@@ -96,7 +108,6 @@ class FlashcardViewState extends State<FlashcardView> {
       );
     }
 
-    print("Word is loaded");
     return Container(
       color: CommonColors.primaryBackgroundColor,
       child: CardSwiper(
@@ -107,6 +118,7 @@ class FlashcardViewState extends State<FlashcardView> {
           onCardSwipe();
           return false;
         },
+        isDisabled: _waitingWords[0].testable && !_waitingWords[0].tested,
         cardBuilder: (context, index) {
           if (index == 0) {
             return TestableWordCardIndex(
@@ -143,7 +155,6 @@ class TestableWordCardIndex extends StatefulWidget {
     this.questionOptions,
     this.onCorrectAnswer,
     this.onWrongAnswer,
-    this.onPass,
     required this.controller,
   });
 
@@ -151,7 +162,6 @@ class TestableWordCardIndex extends StatefulWidget {
   final List<String>? questionOptions;
   final Action? onCorrectAnswer;
   final Action? onWrongAnswer;
-  final Action? onPass;
   final FlipCardController controller;
 
   @override

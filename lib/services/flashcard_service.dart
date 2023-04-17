@@ -23,4 +23,8 @@ class FlashcardService {
     List<String> wordList = await _service.getRandomWordString(limit, List<WordModel>.generate(1, (index) => exclude));
     return wordList;
   }
+
+  Future<void> updateTestResult(WordModel model) async {
+    await _service.update(model.id, model);
+  }
 }
