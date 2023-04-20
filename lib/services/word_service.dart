@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as Sqflite;
 import 'package:word_book/common/date_time_formatter.dart';
@@ -7,15 +9,31 @@ import 'database_service.dart';
 
 class WordService {
   static const String _tableName = "words";
+  final Completer _tableChecked = Completer();
 
   WordService() {
     DatabaseService.createTable(
       _tableName,
-      "CREATE TABLE $_tableName(id INTEGER PRIMARY KEY AUTOINCREMENT, word TEXT, meaning TEXT, pronunciation TEXT, createDate TEXT, modifyDate TEXT, nextTestDate Text, testResult TEXT)",
-    );
+      "CREATE TABLE $_tableName("
+      "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+      "word TEXT,"
+      "meaning TEXT,"
+      "pronunciation TEXT,"
+      "createDate TEXT,"
+      "modifyDate TEXT,"
+      "testInterval INTEGER,"
+      "nextTestDate Text,"
+      "testResult TEXT)",
+    ).then((result) => _tableChecked.complete());
+  }
+
+  Future<void> _waitForTableCheck() async {
+    if (_tableChecked.isCompleted) await _tableChecked.future;
   }
 
   Future<List<WordModel>> getAllData() async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
     var raw = await connection.query(
       _tableName,
@@ -25,6 +43,8 @@ class WordService {
   }
 
   Future<List<WordModel>> getDataLimit(int offset, int limit) async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
     var raw = await connection.query(
       _tableName,
@@ -32,15 +52,29 @@ class WordService {
       limit: limit,
     );
 
-    return List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
+    var list = List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
+    return list;
   }
 
-  Future<List<WordModel>> getTestOutdateWord(int limit) async {
+  Future<List<WordModel>> getTestOutdateWord(int limit, {List<int>? excludeId}) async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
+
+    String whereCondition = "nextTestDate < \"${DateTimeFormatter.format(DateTime.now())}\"";
+    if (excludeId != null) {
+      for (var element in excludeId) {
+        if (whereCondition.isNotEmpty) {
+          whereCondition = "$whereCondition AND id != $element";
+        } else {
+          whereCondition = "id != $element";
+        }
+      }
+    }
+
     var raw = await connection.query(
       _tableName,
-      where: "nextTestDate < ?",
-      whereArgs: [DateTimeFormatter.format(DateTime.now())],
+      where: whereCondition,
       orderBy: "nextTestDate ASC",
       limit: limit,
     );
@@ -48,11 +82,25 @@ class WordService {
     return List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
   }
 
-  Future<List<WordModel>?> getNotTestedWord(int limit) async {
+  Future<List<WordModel>?> getNotTestedWord(int limit, {List<int>? excludeId}) async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
+
+    String whereCondition = "nextTestDate is null OR nextTestDate = \"\"";
+    if (excludeId != null) {
+      for (var element in excludeId) {
+        if (whereCondition.isNotEmpty) {
+          whereCondition = "$whereCondition AND id != $element";
+        } else {
+          whereCondition = "id != $element";
+        }
+      }
+    }
+
     var raw = await connection.query(
       _tableName,
-      where: "nextTestDate is null OR nextTestDate = \"\"",
+      where: whereCondition,
       orderBy: "RANDOM()",
       limit: limit,
     );
@@ -62,6 +110,8 @@ class WordService {
   }
 
   Future<List<String>> getRandomWordString(int limit, List<WordModel>? excludes) async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
 
     String excludeCondition = "";
@@ -86,6 +136,8 @@ class WordService {
   }
 
   Future<void> insertModel(WordModel model) async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
     var dataMap = model.toMap();
     dataMap.remove('id');
@@ -98,6 +150,8 @@ class WordService {
   }
 
   Future<int> getAllCount() async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
     var rawResult = await connection.rawQuery('SELECT COUNT(*) FROM $_tableName');
 
@@ -105,6 +159,8 @@ class WordService {
   }
 
   Future<bool> remove(WordModel model) async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
     var rawResult = await connection.delete(
       _tableName,
@@ -115,6 +171,8 @@ class WordService {
   }
 
   Future<bool> update(int id, WordModel model) async {
+    await _waitForTableCheck();
+
     var connection = await DatabaseService.database;
     await connection.update(
       _tableName,

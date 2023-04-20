@@ -62,10 +62,26 @@ class _CardManageViewPageState extends State<CardManageView> {
               onSelected: (value) {
                 if (value == 'Add') {
                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WordAddView()));
+                } else if (value == 'Create Dummy') {
+                  for (int i = 0; i < 10000; ++i) {
+                    widget._service.insertModel(WordModel(
+                      0,
+                      "word_$i",
+                      "meaning_$i",
+                      "pronunciation",
+                      List<WordTestModel>.empty(),
+                      DateTime.now(),
+                      DateTime.now(),
+                      0,
+                      null,
+                    ));
+                  }
+
+                  print("Dummy data creation complete.");
                 }
               },
               itemBuilder: (BuildContext context) {
-                return {'Add'}.map((String choice) {
+                return {'Add', 'Create Dummy'}.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
                     child: Text(choice),

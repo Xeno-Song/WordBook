@@ -11,6 +11,7 @@ class WordModel {
   List<WordTestModel> testResult = List<WordTestModel>.empty();
   DateTime createDate = DateTime(0, 0, 0, 0, 0, 0);
   DateTime modifyDate = DateTime(0, 0, 0, 0, 0, 0);
+  int testInterval = 0;
   DateTime? nextTestDate = DateTime(0, 0, 0, 0, 0, 0);
 
   WordModel(
@@ -21,6 +22,7 @@ class WordModel {
     this.testResult,
     this.createDate,
     this.modifyDate,
+    this.testInterval,
     this.nextTestDate,
   );
 
@@ -32,6 +34,7 @@ class WordModel {
         List<WordTestModel>.empty(),
         DateTime(0, 0, 0, 0, 0, 0),
         DateTime(0, 0, 0, 0, 0, 0),
+        0,
         DateTime(0, 0, 0, 0, 0, 0),
       );
 
@@ -44,6 +47,7 @@ class WordModel {
       'createDate': DateTimeFormatter.format(createDate),
       'modifyDate': DateTimeFormatter.format(modifyDate),
       'nextTestDate': DateTimeFormatter.format(nextTestDate),
+      'testInterval': testInterval,
       'testResult': json.encode(List<dynamic>.generate(testResult.length, (index) => testResult[index].toMap()))
     };
     if (nextTestDate == null) map.remove('nextTestDate');
@@ -69,6 +73,7 @@ class WordModel {
       WordTestModel.fromJson((map['testResult'].toString())),
       DateTimeFormatter.parse(map['createDate'].toString())!,
       DateTimeFormatter.parse(map['modifyDate'].toString())!,
+      int.parse(map['testInterval'].toString()),
       DateTimeFormatter.parse(map['nextTestDate'].toString()),
     );
   }

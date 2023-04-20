@@ -73,12 +73,20 @@ class FlashcardViewState extends State<FlashcardView> {
     });
 
     if (!model.testable) {
-      model.model.testResult.add(WordTestModel(0, "PASS", DateTime.now()));
-      model.model.nextTestDate = DateTime.now().add(const Duration(minutes: 5));
+      Duration initTestInterval = const Duration(minutes: 5);
+      model.model.testResult.add(WordTestModel(0, "P", DateTime.now()));
+      model.model.nextTestDate = DateTime.now().add(initTestInterval);
+      model.model.modifyDate = DateTime.now();
+      model.model.testInterval = initTestInterval.inMinutes;
       _service.updateTestResult(model.model);
     }
 
-    _service.getNextWord(limit: 1).then((word) {
+    _service
+        .getNextWord(
+      limit: 1,
+      excludeId: List<int>.generate(_waitingWords.length, (index) => _waitingWords[index].model.id),
+    )
+        .then((word) {
       _service.getRandomWordString(3, word![0]).then((value) {
         setState(() {
           _waitingWords.add(FlashcardObject(word[0], value));
@@ -89,6 +97,31 @@ class FlashcardViewState extends State<FlashcardView> {
 
   void onTestResultReceived(bool isCorrect) {
     setState(() => _waitingWords[0].tested = true);
+
+    if (isCorrect) {
+      FlashcardObject testData = _waitingWords[0];
+      WordModel model = testData.model;
+      DateTime currentTime = DateTime.now();
+      model.testResult.add(WordTestModel(model.testResult.length, "P", currentTime));
+      model.testInterval = (model.testInterval * 1.5).ceil();
+      model.modifyDate = currentTime;
+      model.nextTestDate = currentTime.add(Duration(minutes: model.testInterval));
+      _service.updateTestResult(model);
+    } else {
+      FlashcardObject testData = _waitingWords[0];
+      WordModel model = testData.model;
+      DateTime currentTime = DateTime.now();
+      model.testResult.add(WordTestModel(model.testResult.length, "P", currentTime));
+      if (model.testInterval > (60 * 24 * 1.5).ceil()) {
+        model.testInterval = 60 * 24;
+      } else {
+        model.testInterval = (model.testInterval / 3 * 2).ceil();
+      }
+      model.modifyDate = currentTime;
+      model.nextTestDate = currentTime.add(Duration(minutes: model.testInterval));
+
+      _service.updateTestResult(model);
+    }
   }
 
   @override

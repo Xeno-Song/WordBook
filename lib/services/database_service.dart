@@ -22,7 +22,7 @@ class DatabaseService {
     return queryResylt.isNotEmpty;
   }
 
-  static void createTable(String tableName, String query) async {
+  static Future<void> createTable(String tableName, String query) async {
     if (!(await tableExist(tableName))) (await database).execute(query);
   }
 }
