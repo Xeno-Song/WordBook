@@ -87,6 +87,10 @@ class FlashcardViewState extends State<FlashcardView> {
     });
   }
 
+  void onTestResultReceived(bool isCorrect) {
+    setState(() => _waitingWords[0].tested = true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,6 +131,8 @@ class FlashcardViewState extends State<FlashcardView> {
             return TestableWordCardIndex(
               dataObject: _waitingWords[index],
               controller: controller,
+              onCorrectAnswer: () => onTestResultReceived(true),
+              onWrongAnswer: () => onTestResultReceived(false),
             );
           }
           return DecoratedBox(
@@ -174,6 +180,7 @@ class TestableWordCardIndex extends StatefulWidget {
 }
 
 class _TestableWordCardIndexState extends State<TestableWordCardIndex> with SingleTickerProviderStateMixin {
+  FlashcardObject? _oldDataObject;
   int selectedItemIndex = -1;
   Animation? _colorTween;
   AnimationController? _animationController;
@@ -182,6 +189,7 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
   void initState() {
     super.initState();
 
+    _oldDataObject = widget.dataObject;
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -190,6 +198,10 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
       begin: CommonColors.secondaryBackgroundColor,
       end: CommonColors.secondaryBackgroundColor,
     ).animate(_animationController!);
+  }
+
+  void _onDataObjectChanged() {
+    selectedItemIndex = -1;
   }
 
   void onChoiceSelected(int choiceIndex) {
@@ -375,6 +387,10 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
 
   @override
   Widget build(BuildContext context) {
+    if (widget.dataObject != _oldDataObject) {
+      _oldDataObject = widget.dataObject;
+      _onDataObjectChanged();
+    }
     if (widget.dataObject!.model.testResult.isEmpty) {
       return buildWordVisualizationCard();
     } else {
