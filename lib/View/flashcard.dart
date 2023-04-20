@@ -173,12 +173,23 @@ class TestableWordCardIndex extends StatefulWidget {
   }
 }
 
-class _TestableWordCardIndexState extends State<TestableWordCardIndex> {
+class _TestableWordCardIndexState extends State<TestableWordCardIndex> with SingleTickerProviderStateMixin {
   int selectedItemIndex = -1;
+  Animation? _colorTween;
+  AnimationController? _animationController;
 
   @override
   void initState() {
     super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _colorTween = ColorTween(
+      begin: CommonColors.secondaryBackgroundColor,
+      end: CommonColors.secondaryBackgroundColor,
+    ).animate(_animationController!);
   }
 
   void onChoiceSelected(int choiceIndex) {
@@ -194,10 +205,22 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> {
   }
 
   void onCorrectChoice() {
+    _colorTween = ColorTween(
+      begin: const Color.fromARGB(0xFF, 0x19, 0x51, 0x18),
+      end: CommonColors.secondaryBackgroundColor,
+    ).animate(_animationController!);
+    _animationController?.forward(from: 0.0);
+
     widget.onCorrectAnswer?.call();
   }
 
   void onWrongChoice() {
+    _colorTween = ColorTween(
+      begin: const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D),
+      end: CommonColors.secondaryBackgroundColor,
+    ).animate(_animationController!);
+    _animationController?.forward(from: 0.0);
+
     widget.onWrongAnswer?.call();
   }
 
@@ -278,70 +301,75 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> {
   }
 
   Widget buildMultipleChoiceCard() {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0),
-        color: CommonColors.secondaryBackgroundColor,
-        shape: BoxShape.rectangle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black45.withOpacity(0.55),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
+    return AnimatedBuilder(
+      animation: _colorTween!,
+      builder: (BuildContext context, Widget? child) {
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            color: _colorTween!.value,
+            shape: BoxShape.rectangle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black45.withOpacity(0.55),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
-        child: Flex(
-          direction: Axis.vertical,
-          children: [
-            Flexible(
-              flex: 5,
-              child: Center(
-                child: Text(
-                  widget.dataObject!.model.word,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 40,
+          child: SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Flex(
+              direction: Axis.vertical,
+              children: [
+                Flexible(
+                  flex: 5,
+                  child: Center(
+                    child: Text(
+                      widget.dataObject!.model.word,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 40,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Flexible(
-              flex: 4,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                child: Flex(
-                  direction: Axis.vertical,
-                  children: List<Widget>.generate(4, (index) {
-                    Color buttonColor = const Color.fromARGB(50, 20, 20, 20);
-                    if (selectedItemIndex != -1) {
-                      if (widget.dataObject!.answerIndex == index) {
-                        buttonColor = const Color.fromARGB(0xFF, 0x19, 0x51, 0x18);
-                      } else if (index == selectedItemIndex) {
-                        buttonColor = const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D);
-                      }
-                    }
+                Flexible(
+                  flex: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                    child: Flex(
+                      direction: Axis.vertical,
+                      children: List<Widget>.generate(4, (index) {
+                        Color buttonColor = const Color.fromARGB(50, 20, 20, 20);
+                        if (selectedItemIndex != -1) {
+                          if (widget.dataObject!.answerIndex == index) {
+                            buttonColor = const Color.fromARGB(0xFF, 0x19, 0x51, 0x18);
+                          } else if (index == selectedItemIndex) {
+                            buttonColor = const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D);
+                          }
+                        }
 
-                    return Flexible(
-                      flex: 1,
-                      child: ChoiceButton(
-                        text: widget.dataObject!.choices[index],
-                        onPressed: () => onChoiceSelected(index),
-                        backgroundColor: buttonColor,
-                        enable: selectedItemIndex == -1,
-                      ),
-                    );
-                  }),
+                        return Flexible(
+                          flex: 1,
+                          child: ChoiceButton(
+                            text: widget.dataObject!.choices[index],
+                            onPressed: () => onChoiceSelected(index),
+                            backgroundColor: buttonColor,
+                            enable: selectedItemIndex == -1,
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
