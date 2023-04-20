@@ -22,6 +22,8 @@ class FlashcardObject {
     choices = <String>[model.word] + choices;
     choices.shuffle();
 
+    answerIndex = choices.indexOf(model.word);
+
     testable = model.testResult.isNotEmpty;
     tested = false;
   }
@@ -30,6 +32,7 @@ class FlashcardObject {
   List<String> choices;
   bool testable = false;
   bool tested = false;
+  int answerIndex = -1;
 }
 
 class FlashcardView extends StatefulWidget {
@@ -160,8 +163,8 @@ class TestableWordCardIndex extends StatefulWidget {
 
   final FlashcardObject? dataObject;
   final List<String>? questionOptions;
-  final Action? onCorrectAnswer;
-  final Action? onWrongAnswer;
+  final Function()? onCorrectAnswer;
+  final Function()? onWrongAnswer;
   final FlipCardController controller;
 
   @override
@@ -171,9 +174,31 @@ class TestableWordCardIndex extends StatefulWidget {
 }
 
 class _TestableWordCardIndexState extends State<TestableWordCardIndex> {
+  int selectedItemIndex = -1;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  void onChoiceSelected(int choiceIndex) {
+    setState(() => selectedItemIndex = choiceIndex);
+
+    // . widget.questionOptions[choiceIndex];
+    String correctWord = widget.dataObject!.model.word;
+    if (correctWord == widget.dataObject!.choices[choiceIndex]) {
+      onCorrectChoice();
+    } else {
+      onWrongChoice();
+    }
+  }
+
+  void onCorrectChoice() {
+    widget.onCorrectAnswer?.call();
+  }
+
+  void onWrongChoice() {
+    widget.onWrongAnswer?.call();
   }
 
   Widget buildWordVisualizationCard() {
@@ -286,29 +311,31 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> {
               ),
             ),
             Flexible(
-              flex: 1,
-              child: ChoiceButton(
-                text: widget.dataObject!.choices[0],
-              ),
-            ),
-            Flexible(
-              flex: 1,
-              child: ChoiceButton(
-                text: widget.dataObject!.choices[1],
-              ),
-            ),
-            Flexible(
-              flex: 1,
-              child: ChoiceButton(
-                text: widget.dataObject!.choices[2],
-              ),
-            ),
-            Flexible(
-              flex: 1,
+              flex: 4,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                child: ChoiceButton(
-                  text: widget.dataObject!.choices[3],
+                child: Flex(
+                  direction: Axis.vertical,
+                  children: List<Widget>.generate(4, (index) {
+                    Color buttonColor = const Color.fromARGB(50, 20, 20, 20);
+                    if (selectedItemIndex != -1) {
+                      if (widget.dataObject!.answerIndex == index) {
+                        buttonColor = const Color.fromARGB(0xFF, 0x19, 0x51, 0x18);
+                      } else if (index == selectedItemIndex) {
+                        buttonColor = const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D);
+                      }
+                    }
+
+                    return Flexible(
+                      flex: 1,
+                      child: ChoiceButton(
+                        text: widget.dataObject!.choices[index],
+                        onPressed: () => onChoiceSelected(index),
+                        backgroundColor: buttonColor,
+                        enable: selectedItemIndex == -1,
+                      ),
+                    );
+                  }),
                 ),
               ),
             ),
@@ -333,10 +360,14 @@ class ChoiceButton extends StatefulWidget {
     super.key,
     required this.text,
     this.onPressed,
+    this.backgroundColor = Colors.transparent,
+    this.enable = true,
   });
 
   final String? text;
   final Function()? onPressed;
+  final Color? backgroundColor;
+  final bool? enable;
 
   @override
   State<StatefulWidget> createState() {
@@ -355,7 +386,7 @@ class _ChoiceButtonState extends State<ChoiceButton> {
         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
         child: OutlinedButton(
           style: OutlinedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(50, 20, 20, 20),
+            backgroundColor: widget.backgroundColor,
             elevation: 20,
             shadowColor: Colors.black38,
             shape: RoundedRectangleBorder(
@@ -365,12 +396,18 @@ class _ChoiceButtonState extends State<ChoiceButton> {
               color: Colors.white54,
             ),
           ),
-          onPressed: () => widget.onPressed?.call(),
+          onPressed: widget.enable == true ? () => widget.onPressed?.call() : null,
           child: Container(
             alignment: Alignment.center,
             width: double.infinity,
             height: double.infinity,
-            child: Text(widget.text!),
+            child: Text(
+              widget.text!,
+              style: const TextStyle(
+                color: CommonColors.primaryForegroundColor,
+                // color: Colors.white,
+              ),
+            ),
           ),
         ),
       ),
