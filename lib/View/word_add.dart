@@ -81,60 +81,77 @@ class _WordAddViewState extends State<WordAddView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CommonTextInputField(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
-              controller: _wordTextEditingController,
-              hint: "Word",
-              errorMessage: wordTextErrorMessage,
-            ),
-            CommonTextInputField(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
-              controller: _pronunciationTextEditingController,
-              hint: "Pronunciation (Optional)",
-            ),
-            CommonTextInputField(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
-              controller: _meaningTextEditingController,
-              hint: "Meaning",
-              errorMessage: meaningTextErrorMessage,
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(20, 10, 20, 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+            Expanded(
+              child: Column(
                 children: [
-                  Checkbox(
-                    checkColor: Colors.white,
-                    activeColor: Colors.purple,
-                    side: const BorderSide(
-                      color: Colors.white,
-                      width: 1.5,
-                    ),
-                    value: _isContinueCreation,
-                    onChanged: (value) {
-                      setState(() {
-                        _isContinueCreation = value!;
-                      });
-                    },
+                  CommonTextInputField(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 5),
+                    controller: _wordTextEditingController,
+                    hint: "Word",
+                    errorMessage: wordTextErrorMessage,
+                    foregroundColor: CommonColors.white80,
                   ),
-                  const Text(
-                    style: TextStyle(
-                      color: Colors.white,
+                  CommonTextInputField(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
+                    controller: _pronunciationTextEditingController,
+                    hint: "Pronunciation",
+                    foregroundColor: CommonColors.white80,
+                  ),
+                  CommonTextInputField(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
+                    controller: _meaningTextEditingController,
+                    hint: "Meaning",
+                    errorMessage: meaningTextErrorMessage,
+                    foregroundColor: CommonColors.white80,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(20, 10, 20, 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          checkColor: Colors.white70,
+                          activeColor: Colors.purple,
+                          side: const BorderSide(
+                            color: Colors.white70,
+                            width: 1.5,
+                          ),
+                          value: _isContinueCreation,
+                          onChanged: (value) {
+                            setState(() {
+                              _isContinueCreation = value!;
+                            });
+                          },
+                        ),
+                        GestureDetector(
+                          onTap: () => setState(() {
+                            _isContinueCreation = !_isContinueCreation;
+                          }),
+                          child: const Text(
+                            style: TextStyle(
+                              color: CommonColors.white80,
+                            ),
+                            "Continous generation",
+                          ),
+                        ),
+                      ],
                     ),
-                    "Continous generation",
                   ),
                 ],
               ),
             ),
             Container(
-              margin: const EdgeInsets.fromLTRB(20, 10, 20, 5),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              color: CommonColors.secondaryBackgroundColor,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: CommonColors.primaryBackgroundColor,
+                      padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
                       foregroundColor: CommonColors.primaryForegroundColor,
+                      elevation: 20,
+                      shadowColor: Colors.black45,
                     ),
                     onPressed: () {
                       gotoBackPage();
@@ -143,8 +160,10 @@ class _WordAddViewState extends State<WordAddView> {
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
-                      backgroundColor: CommonColors.primaryBackgroundColor,
+                      padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
                       foregroundColor: CommonColors.primaryThemeColorBrighter,
+                      elevation: 20,
+                      shadowColor: Colors.black45,
                     ),
                     onPressed: () {
                       createNewWord();

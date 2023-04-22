@@ -7,13 +7,15 @@ class CommonTextInputField extends StatefulWidget {
     this.controller,
     this.hint,
     this.padding = const EdgeInsets.fromLTRB(20, 10, 20, 10),
-    this.errorMessage = null,
+    this.errorMessage,
+    this.foregroundColor = Colors.white,
   });
 
   final TextEditingController? controller;
   final String? hint;
   final EdgeInsetsGeometry? padding;
   final String? errorMessage;
+  final Color foregroundColor;
 
   @override
   State<StatefulWidget> createState() {
@@ -29,34 +31,40 @@ class _CommonTextInputFieldState extends State<CommonTextInputField> {
       child: TextField(
         controller: widget.controller,
         decoration: InputDecoration(
-          enabledBorder: const OutlineInputBorder(
+          enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: Colors.white,
+              color: widget.foregroundColor,
               width: 2,
             ),
-            borderRadius: BorderRadius.all(Radius.circular(5)),
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
           ),
-          focusedBorder: const OutlineInputBorder(
+          focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: Colors.white,
+              color: widget.foregroundColor,
               width: 2,
             ),
-            borderRadius: BorderRadius.all(Radius.circular(5)),
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
           ),
-          labelStyle: const TextStyle(
-            color: Colors.white,
+          labelStyle: TextStyle(
+            color: widget.foregroundColor,
           ),
+          labelText: widget.hint,
           errorStyle: const TextStyle(
             color: Colors.red,
           ),
           hintText: widget.hint,
-          hintStyle: const TextStyle(
-            color: Colors.white60,
+          hintStyle: TextStyle(
+            color: Color.fromRGBO(
+              widget.foregroundColor.red,
+              widget.foregroundColor.green,
+              widget.foregroundColor.blue,
+              widget.foregroundColor.opacity * 0.6,
+            ),
           ),
           errorText: widget.errorMessage,
         ),
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: widget.foregroundColor,
         ),
       ),
     );
