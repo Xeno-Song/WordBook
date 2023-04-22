@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:async';
 
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as Sqflite;
@@ -12,7 +13,7 @@ class WordService {
   final Completer _tableChecked = Completer();
 
   WordService() {
-    DatabaseService.createTable(
+    _tableChecked.complete(DatabaseService.createTable(
       _tableName,
       "CREATE TABLE $_tableName("
       "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -24,7 +25,7 @@ class WordService {
       "testInterval INTEGER,"
       "nextTestDate Text,"
       "testResult TEXT)",
-    ).then((result) => _tableChecked.complete());
+    ));
   }
 
   Future<void> _waitForTableCheck() async {
@@ -50,6 +51,22 @@ class WordService {
       _tableName,
       offset: offset,
       limit: limit,
+    );
+
+    var list = List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
+    return list;
+  }
+
+  Future<List<WordModel>> getData({int? offset, int? limit, String? order, String? where}) async {
+    await _waitForTableCheck();
+
+    var connection = await DatabaseService.database;
+    var raw = await connection.query(
+      _tableName,
+      offset: offset,
+      limit: limit,
+      orderBy: order,
+      where: where,
     );
 
     var list = List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
@@ -142,7 +159,7 @@ class WordService {
     var dataMap = model.toMap();
     dataMap.remove('id');
 
-    connection.insert(
+    await connection.insert(
       _tableName,
       dataMap,
       conflictAlgorithm: ConflictAlgorithm.replace,
