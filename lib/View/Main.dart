@@ -11,6 +11,7 @@ import '../services/word_service.dart';
 import 'card_manage.dart';
 import 'components/common/appbar.dart';
 import 'components/common/drawer.dart';
+import 'flashcard.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -152,8 +153,16 @@ class _MainViewPageState extends State<MainView> {
                                     const Color.fromARGB(0xFF, 0xBC, 0xD0, 0xFF),
                                   ),
                                 ),
-                                onPressed: () {},
-                                child: const Text("Button #1"),
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FlashcardView()));
+                                },
+                                child: const Text(
+                                  "Flash Card",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: CommonColors.primaryBackgroundColor,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -183,7 +192,7 @@ class _MainViewPageState extends State<MainView> {
                                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
                                 },
                                 child: const Text(
-                                  "단어 관리",
+                                  "Manage Words",
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: CommonColors.primaryBackgroundColor,

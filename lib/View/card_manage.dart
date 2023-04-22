@@ -12,7 +12,6 @@ import 'components/common/drawer.dart';
 
 class CardManageView extends StatefulWidget {
   CardManageView({super.key, this.itemPerPage = 100});
-  final WordService _service = WordService();
 
   final int? itemPerPage;
 
@@ -23,6 +22,7 @@ class CardManageView extends StatefulWidget {
 }
 
 class _CardManageViewPageState extends State<CardManageView> {
+  final WordService _service = WordService();
   int currentPage = 1;
   int maxPage = 1;
   ListingCondition _listingCondition = ListingCondition.createDateAsc;
@@ -34,7 +34,7 @@ class _CardManageViewPageState extends State<CardManageView> {
   }
 
   void updateMaxPage() {
-    widget._service.getAllCount().then((int count) {
+    _service.getAllCount().then((int count) {
       setState(() {
         maxPage = ((count / 100) + (count % 100 == 0 ? 0 : 1)).toInt();
         if (currentPage > maxPage) currentPage = maxPage;
@@ -49,7 +49,7 @@ class _CardManageViewPageState extends State<CardManageView> {
   }
 
   void deleteWord(WordModel model) {
-    widget._service.remove(model).then((value) => setState(() {
+    _service.remove(model).then((value) => setState(() {
           updateMaxPage();
         }));
   }
@@ -64,7 +64,7 @@ class _CardManageViewPageState extends State<CardManageView> {
     DateTime dataTime = DateTime.now().add(const Duration(seconds: -dataCount));
 
     for (int i = 0; i < 10000; ++i) {
-      await widget._service.insertModel(WordModel(
+      await _service.insertModel(WordModel(
         0,
         "word_$i",
         "meaning_$i",
@@ -76,7 +76,6 @@ class _CardManageViewPageState extends State<CardManageView> {
         null,
       ));
 
-      print(DateTimeFormatter.format(dataTime));
       dataTime = dataTime.add(const Duration(seconds: 1));
     }
 
@@ -134,7 +133,7 @@ class _CardManageViewPageState extends State<CardManageView> {
             children: [
               Expanded(
                 child: FutureBuilder(
-                  future: widget._service.getData(
+                  future: _service.getData(
                       offset: (currentPage - 1) * 100,
                       limit: 100,
                       order: ListingConditionConverter.convertToQuery(_listingCondition)),
@@ -147,7 +146,7 @@ class _CardManageViewPageState extends State<CardManageView> {
                       );
                     }
                     return CardManageItemBuilder(
-                      service: widget._service,
+                      service: _service,
                       offset: (currentPage - 1) * 100,
                       count: 100,
                       onTrailingTap: handleWordItemTrailingMenuTap,
