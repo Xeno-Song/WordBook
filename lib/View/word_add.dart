@@ -25,8 +25,8 @@ class _WordAddViewState extends State<WordAddView> {
   bool _isContinueCreation = false;
 
   final _wordService = WordService();
-  String? wordTextErrorMessage = null;
-  String? meaningTextErrorMessage = null;
+  String? wordTextErrorMessage;
+  String? meaningTextErrorMessage;
 
   void gotoBackPage() => Navigator.of(context).pop();
 
@@ -90,6 +90,7 @@ class _WordAddViewState extends State<WordAddView> {
                     hint: "Word",
                     errorMessage: wordTextErrorMessage,
                     foregroundColor: CommonColors.white80,
+                    onChanged: (value) => setState(() => wordTextErrorMessage = null),
                   ),
                   CommonTextInputField(
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
@@ -103,6 +104,7 @@ class _WordAddViewState extends State<WordAddView> {
                     hint: "Meaning",
                     errorMessage: meaningTextErrorMessage,
                     foregroundColor: CommonColors.white80,
+                    onChanged: (value) => setState(() => meaningTextErrorMessage = null),
                   ),
                   Container(
                     margin: const EdgeInsets.fromLTRB(20, 10, 20, 5),
@@ -110,10 +112,10 @@ class _WordAddViewState extends State<WordAddView> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Checkbox(
-                          checkColor: Colors.white70,
+                          checkColor: CommonColors.white80,
                           activeColor: Colors.purple,
                           side: const BorderSide(
-                            color: Colors.white70,
+                            color: CommonColors.white80,
                             width: 1.5,
                           ),
                           value: _isContinueCreation,

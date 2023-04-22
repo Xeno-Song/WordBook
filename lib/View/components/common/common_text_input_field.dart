@@ -9,6 +9,7 @@ class CommonTextInputField extends StatefulWidget {
     this.padding = const EdgeInsets.fromLTRB(20, 10, 20, 10),
     this.errorMessage,
     this.foregroundColor = Colors.white,
+    this.onChanged = null,
   });
 
   final TextEditingController? controller;
@@ -16,6 +17,7 @@ class CommonTextInputField extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
   final String? errorMessage;
   final Color foregroundColor;
+  final Function(String)? onChanged;
 
   @override
   State<StatefulWidget> createState() {
@@ -61,11 +63,26 @@ class _CommonTextInputFieldState extends State<CommonTextInputField> {
               widget.foregroundColor.opacity * 0.6,
             ),
           ),
+          errorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.red,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+          focusedErrorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.red,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
           errorText: widget.errorMessage,
         ),
         style: TextStyle(
           color: widget.foregroundColor,
         ),
+        onChanged: (value) => widget.onChanged?.call(value),
       ),
     );
   }
