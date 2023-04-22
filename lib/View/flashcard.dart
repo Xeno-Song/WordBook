@@ -10,6 +10,7 @@ import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:word_book/View/components/common/appbar.dart';
 import 'package:word_book/View/components/common/colors.dart';
+import 'package:word_book/View/components/common/configuration.dart';
 import 'package:word_book/common/date_time_formatter.dart';
 import 'package:word_book/model/WordTestModel.dart';
 import 'package:word_book/services/flashcard_service.dart';
@@ -73,7 +74,7 @@ class FlashcardViewState extends State<FlashcardView> {
     });
 
     if (!model.testable) {
-      Duration initTestInterval = const Duration(minutes: 5);
+      Duration initTestInterval = Duration(minutes: Configuration.minTestInterval);
       model.model.testResult.add(WordTestModel(0, "P", DateTime.now()));
       model.model.nextTestDate = DateTime.now().add(initTestInterval);
       model.model.modifyDate = DateTime.now();
@@ -98,30 +99,25 @@ class FlashcardViewState extends State<FlashcardView> {
   void onTestResultReceived(bool isCorrect) {
     setState(() => _waitingWords[0].tested = true);
 
+    FlashcardObject testData = _waitingWords[0];
+    WordModel model = testData.model;
+    DateTime currentTime = DateTime.now();
+
     if (isCorrect) {
-      FlashcardObject testData = _waitingWords[0];
-      WordModel model = testData.model;
-      DateTime currentTime = DateTime.now();
       model.testResult.add(WordTestModel(model.testResult.length, "P", currentTime));
       model.testInterval = (model.testInterval * 1.5).ceil();
-      model.modifyDate = currentTime;
-      model.nextTestDate = currentTime.add(Duration(minutes: model.testInterval));
-      _service.updateTestResult(model);
     } else {
-      FlashcardObject testData = _waitingWords[0];
-      WordModel model = testData.model;
-      DateTime currentTime = DateTime.now();
       model.testResult.add(WordTestModel(model.testResult.length, "P", currentTime));
       if (model.testInterval > (60 * 24 * 1.5).ceil()) {
         model.testInterval = 60 * 24;
       } else {
-        model.testInterval = (model.testInterval / 3 * 2).ceil();
+        model.testInterval = min((model.testInterval / 3 * 2).ceil(), Configuration.minTestInterval);
       }
-      model.modifyDate = currentTime;
-      model.nextTestDate = currentTime.add(Duration(minutes: model.testInterval));
-
-      _service.updateTestResult(model);
     }
+
+    model.modifyDate = currentTime;
+    model.nextTestDate = currentTime.add(Duration(minutes: model.testInterval));
+    _service.updateTestResult(model);
   }
 
   @override
@@ -346,75 +342,123 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
   }
 
   Widget buildMultipleChoiceCard() {
-    return AnimatedBuilder(
-      animation: _colorTween!,
-      builder: (BuildContext context, Widget? child) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            color: _colorTween!.value,
-            shape: BoxShape.rectangle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black45.withOpacity(0.55),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: Flex(
-              direction: Axis.vertical,
-              children: [
-                Flexible(
-                  flex: 5,
-                  child: Center(
-                    child: Text(
-                      widget.dataObject!.model.word,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                      ),
-                    ),
-                  ),
-                ),
-                Flexible(
-                  flex: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                    child: Flex(
-                      direction: Axis.vertical,
-                      children: List<Widget>.generate(4, (index) {
-                        Color buttonColor = const Color.fromARGB(50, 20, 20, 20);
-                        if (selectedItemIndex != -1) {
-                          if (widget.dataObject!.answerIndex == index) {
-                            buttonColor = const Color.fromARGB(0xFF, 0x19, 0x51, 0x18);
-                          } else if (index == selectedItemIndex) {
-                            buttonColor = const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D);
-                          }
-                        }
-
-                        return Flexible(
-                          flex: 1,
-                          child: ChoiceButton(
-                            text: widget.dataObject!.choices[index],
-                            onPressed: () => onChoiceSelected(index),
-                            backgroundColor: buttonColor,
-                            enable: selectedItemIndex == -1,
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
+    return FlipCard(
+      frontWidget: AnimatedBuilder(
+        animation: _colorTween!,
+        builder: (BuildContext context, Widget? child) {
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              color: _colorTween!.value,
+              shape: BoxShape.rectangle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black45.withOpacity(0.55),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
-          ),
-        );
-      },
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: Flex(
+                direction: Axis.vertical,
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: Center(
+                      child: Text(
+                        widget.dataObject!.model.word,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 40,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    flex: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                      child: Flex(
+                        direction: Axis.vertical,
+                        children: List<Widget>.generate(4, (index) {
+                          Color buttonColor = const Color.fromARGB(50, 20, 20, 20);
+                          if (selectedItemIndex != -1) {
+                            if (widget.dataObject!.answerIndex == index) {
+                              buttonColor = const Color.fromARGB(0xFF, 0x19, 0x51, 0x18);
+                            } else if (index == selectedItemIndex) {
+                              buttonColor = const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D);
+                            }
+                          }
+
+                          return Flexible(
+                            flex: 1,
+                            child: ChoiceButton(
+                              text: widget.dataObject!.choices[index],
+                              onPressed: () => onChoiceSelected(index),
+                              backgroundColor: buttonColor,
+                              enable: selectedItemIndex == -1,
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+      backWidget: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          color: CommonColors.secondaryBackgroundColor,
+          shape: BoxShape.rectangle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black45.withOpacity(0.55),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+              child: Center(
+                child: Text(
+                  widget.dataObject!.model.pronunciation,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                  ),
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                widget.dataObject!.model.meaning,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 30,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      controller: widget.controller,
+      rotateSide: RotateSide.left,
+      onTapFlipping: selectedItemIndex != -1,
+      animationDuration: const Duration(milliseconds: 300),
     );
   }
 
