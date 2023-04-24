@@ -143,15 +143,22 @@ class _WordAddViewState extends State<WordAddView> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              // padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               color: CommonColors.secondaryBackgroundColor,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                      padding: const EdgeInsets.fromLTRB(20, 25, 40, 25),
                       foregroundColor: CommonColors.primaryForegroundColor,
+                      shape: const RoundedRectangleBorder(
+                        side: BorderSide.none,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(50),
+                          bottomRight: Radius.circular(50),
+                        ),
+                      ),
                       elevation: 20,
                       shadowColor: Colors.black45,
                     ),
@@ -162,8 +169,15 @@ class _WordAddViewState extends State<WordAddView> {
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                      padding: const EdgeInsets.fromLTRB(40, 25, 20, 25),
                       foregroundColor: CommonColors.primaryThemeColorBrighter,
+                      shape: const RoundedRectangleBorder(
+                        side: BorderSide.none,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(50),
+                          bottomLeft: Radius.circular(50),
+                        ),
+                      ),
                       elevation: 20,
                       shadowColor: Colors.black45,
                     ),
