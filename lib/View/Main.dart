@@ -11,6 +11,7 @@ import '../services/word_service.dart';
 import 'card_manage.dart';
 import 'components/common/appbar.dart';
 import 'components/common/drawer.dart';
+import 'components/flip_number.dart';
 import 'flashcard.dart';
 
 class MainView extends StatefulWidget {
@@ -80,55 +81,34 @@ class _MainViewPageState extends State<MainView> {
                           color: CommonColors.secondaryBackgroundColor,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color.fromARGB(0x26, 0, 0, 0),
-                              offset: Offset.fromDirection(0.785398, 5),
-                              blurRadius: 6,
-                              spreadRadius: 2,
+                              color: Colors.black45.withOpacity(0.55),
+                              spreadRadius: 5,
+                              blurRadius: 10,
                             ),
                           ],
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            SizedBox(
-                              height: 48,
-                              child: Container(
-                                alignment: Alignment.centerLeft,
-                                padding: const EdgeInsets.all(12),
-                                child: const Text(
-                                  "오늘의 단어",
-                                  style: TextStyle(
-                                    color: CommonColors.primaryForegroundColor,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 3,
-                              decoration: const BoxDecoration(
-                                color: CommonColors.primaryForegroundColor,
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: const Text(
-                                  "彼女\n그녀",
-                                  style: TextStyle(
-                                    color: CommonColors.primaryForegroundColor,
-                                    fontSize: 40,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        child: Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("등록된 단어 : "),
+                              const Text("학습중인 단어 : "),
+                              const Text("미학습 단어 : "),
+                              const Text("장기 기억 단어 : "),
+                              FlipNumber(),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                   ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 100, maxHeight: 200),
+                    constraints: const BoxConstraints(minHeight: 100, maxHeight: 150),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                       child: Column(
@@ -143,15 +123,13 @@ class _MainViewPageState extends State<MainView> {
                                 ),
                               ),
                               child: TextButton(
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                                style: FilledButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  backgroundColor: MaterialStateProperty.all<Color>(
-                                    const Color.fromARGB(0xFF, 0xBC, 0xD0, 0xFF),
-                                  ),
+                                  backgroundColor: const Color.fromARGB(0xFF, 0xBC, 0xDC, 0xFF),
+                                  shadowColor: Colors.black45.withOpacity(0.55),
+                                  elevation: 20,
                                 ),
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FlashcardView()));
@@ -159,7 +137,7 @@ class _MainViewPageState extends State<MainView> {
                                 child: const Text(
                                   "Flash Card",
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 15,
                                     color: CommonColors.primaryBackgroundColor,
                                   ),
                                 ),
@@ -178,23 +156,31 @@ class _MainViewPageState extends State<MainView> {
                                 ),
                               ),
                               child: TextButton(
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                                style: FilledButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  backgroundColor: MaterialStateProperty.all<Color>(
-                                    const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
-                                  ),
+                                  backgroundColor: const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
+                                  shadowColor: Colors.black45.withOpacity(0.55),
+                                  elevation: 20,
                                 ),
+                                // style: ButtonStyle(
+                                //   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                //     RoundedRectangleBorder(
+                                //       borderRadius: BorderRadius.circular(20),
+                                //     ),
+                                //   ),
+                                //   backgroundColor: MaterialStateProperty.all<Color>(
+                                //     const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
+                                //   ),
+                                // ),
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
                                 },
                                 child: const Text(
                                   "Manage Words",
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 15,
                                     color: CommonColors.primaryBackgroundColor,
                                   ),
                                 ),
