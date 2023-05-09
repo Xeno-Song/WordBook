@@ -1,8 +1,64 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+class HorizontalFlipNumber extends StatefulWidget {
+  const HorizontalFlipNumber({
+    super.key,
+    required this.digits,
+    required this.value,
+    required this.height,
+    required this.width,
+    required this.gapBetweenDigits,
+  });
+
+  final int digits;
+  final int value;
+  final double height;
+  final double width;
+  final double gapBetweenDigits;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _HorizontalFlipNumberState();
+  }
+}
+
+class _HorizontalFlipNumberState extends State<HorizontalFlipNumber> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: List<Widget>.generate(
+        widget.digits,
+        (index) {
+          return Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, widget.gapBetweenDigits, 0),
+            child: FlipNumber(
+              value: (widget.value / pow(10, widget.digits - index - 1)).floor() % 10,
+              height: 50,
+              width: 30,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class FlipNumber extends StatefulWidget {
-  FlipNumber({super.key});
+  const FlipNumber({
+    super.key,
+    required this.value,
+    required this.width,
+    required this.height,
+  });
+
+  final int value;
+  final double width;
+  final double height;
 
   @override
   State<StatefulWidget> createState() {
@@ -22,9 +78,8 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
 
   final double pi = 3.141592;
 
-  final double height = 50;
-  final double width = 30;
-  final int animationTime = 500;
+  final int animationTime = 80;
+  // final int targetNumber = 9;
   int _flipStage = 0;
   int _oldNumber = 0;
   int _newNumber = 1;
@@ -52,7 +107,11 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
         if (status == AnimationStatus.dismissed) {
           if (_flipStage == 1) {
             _flipStage = 2;
-            setState(() => _oldNumber = _newNumber);
+            setState(() {
+              _oldNumber = _newNumber;
+              onNumberChanged();
+              // changeToNewNumber((_newNumber + 1) % 10);
+            });
           }
         }
       })
@@ -65,62 +124,93 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
     _controller?.forward(from: 0.0);
   }
 
+  void onNumberChanged() {
+    if (widget.value != _oldNumber) {
+      int nextNumber = (_oldNumber + 1) % 10;
+      int numberDiff = (widget.value + 10 - nextNumber) % 10;
+      int animationDuration = animationTime;
+
+      switch (numberDiff) {
+        case 2:
+          animationDuration = (animationDuration * 1.5).ceil();
+          break;
+        case 1:
+          animationDuration = (animationDuration * 2);
+          break;
+        case 0:
+          animationDuration = (animationDuration * 3).ceil();
+          break;
+      }
+
+      _controller?.duration = Duration(milliseconds: animationDuration);
+      changeToNewNumber((_oldNumber + 1) % 10);
+    }
+  }
+
+  void changeToNewNumber(int newNumber) {
+    _newNumber = newNumber;
+    _flipStage = 0;
+    _controller?.forward(from: 0.0);
+  }
+
   @override
   Widget build(BuildContext context) {
-    print("Stage : ${_flipStage} : ${_animation?.value}");
+    // print("Stage : ${_flipStage} : ${_animation?.value} / $_oldNumber,$_newNumber");
 
     return AnimatedBuilder(
       animation: _animation!,
       builder: (context, child) {
         return SizedBox(
-          width: width,
-          height: height,
+          width: widget.width,
+          height: widget.height,
           child: Stack(
             children: [
               _FlipNumberIndex(
-                value: _oldNumber,
-                width: width,
-                height: height / 2,
+                // upper new
+                value: _newNumber,
+                width: widget.width,
+                height: widget.height / 2,
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(0, height / 2, 0, 0),
+                // upper old
+                padding: EdgeInsets.fromLTRB(0, widget.height / 2, 0, 0),
                 child: Transform(
                   alignment: Alignment.topCenter,
                   transform: Matrix4.identity()
-                    //..translate(0, -height / 2, 0)
-                    ..rotateX(_flipStage == 1 ? _animation?.value : pi / 2)
-                    //..translate(0, height / 2, 0)
+                    ..rotateX(_flipStage == 0 ? _animation?.value : pi / 2)
                     ..setEntry(3, 2, _perspective),
                   child: Container(
-                    transform: Matrix4.translationValues(0.0, -height / 2, 0.0),
+                    transform: Matrix4.translationValues(0.0, -widget.height / 2, 0.0),
                     child: _FlipNumberIndex(
-                      value: _newNumber,
-                      width: width,
-                      height: height / 2,
+                      value: _oldNumber,
+                      width: widget.width,
+                      height: widget.height / 2,
                     ),
                   ),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(0, height / 2, 0, 0),
+                // bottom old
+                padding: EdgeInsets.fromLTRB(0, widget.height / 2, 0, 0),
                 child: _FlipNumberIndex(
-                  value: _newNumber,
-                  width: width,
-                  height: height / 2,
+                  value: _oldNumber,
+                  width: widget.width,
+                  height: widget.height / 2,
                   isUpper: false,
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(0, height / 2, 0, 0),
+                // bottom new
+                padding: EdgeInsets.fromLTRB(0, widget.height / 2, 0, 0),
                 child: Transform(
                   alignment: Alignment.topCenter,
                   transform: Matrix4.identity()
                     ..setEntry(3, 2, _perspective)
-                    ..rotateX(_flipStage == 0 ? _animation?.value : pi / 2),
+                    ..rotateX(_flipStage == 1 ? _animation?.value : pi / 2),
                   child: _FlipNumberIndex(
-                    value: _oldNumber,
-                    width: width,
-                    height: height / 2,
+                    value: _newNumber,
+                    width: widget.width,
+                    height: widget.height / 2,
                     isUpper: false,
                   ),
                 ),
@@ -148,7 +238,7 @@ class _FlipNumberIndex extends StatelessWidget {
   final bool isUpper;
   final Color outlineColor;
 
-  static const double _topOffsetRatio = 0.2;
+  static const double _topOffsetRatio = 0.1;
   static const double _textSizeRatio = 1.2;
 
   @override
