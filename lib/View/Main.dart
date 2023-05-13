@@ -92,7 +92,7 @@ class _MainViewPageState extends State<MainView> {
                         child: Container(
                           width: double.infinity,
                           height: double.infinity,
-                          padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                          padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                           alignment: Alignment.centerLeft,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -113,6 +113,15 @@ class _MainViewPageState extends State<MainView> {
                                 width: 30,
                                 gapBetweenDigits: 3,
                                 controller: controller,
+                              ),
+                              LabeledNumberIndicator(
+                                labelWidth: 80,
+                                label: "등록된 단어",
+                                controller: controller,
+                                labelStyle: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                ),
                               ),
                             ],
                           ),
@@ -294,5 +303,53 @@ class _MainViewPageState extends State<MainView> {
         );
       }
     });
+  }
+}
+
+class LabeledNumberIndicator extends StatefulWidget {
+  const LabeledNumberIndicator({
+    super.key,
+    this.labelStyle,
+    this.labelWidth,
+    this.label,
+    required this.controller,
+  });
+
+  final double? labelWidth;
+  final String? label;
+  final TextStyle? labelStyle;
+  final HorizontalFlipNumberController controller;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _LabelNumberIndicatorState();
+  }
+}
+
+class _LabelNumberIndicatorState extends State<LabeledNumberIndicator> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+          width: widget.labelWidth,
+          alignment: Alignment.centerRight,
+          child: Text(
+            widget.label!,
+            style: widget.labelStyle,
+          ),
+        ),
+        HorizontalFlipNumber(
+          digits: 5,
+          height: 50,
+          width: 30,
+          gapBetweenDigits: 3,
+          controller: widget.controller,
+        ),
+      ],
+    );
   }
 }

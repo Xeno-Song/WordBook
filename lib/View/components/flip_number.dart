@@ -141,7 +141,6 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
             setState(() {
               _oldNumber = _newNumber;
               onNumberChanged();
-              // changeToNewNumber((_newNumber + 1) % 10);
             });
           }
         }
