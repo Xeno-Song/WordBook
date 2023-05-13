@@ -3,21 +3,25 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+class HorizontalFlipNumberController extends ValueNotifier<int> {
+  HorizontalFlipNumberController(super.value);
+}
+
 class HorizontalFlipNumber extends StatefulWidget {
   const HorizontalFlipNumber({
     super.key,
     required this.digits,
-    required this.value,
     required this.height,
     required this.width,
     required this.gapBetweenDigits,
+    required this.controller,
   });
 
   final int digits;
-  final int value;
   final double height;
   final double width;
   final double gapBetweenDigits;
+  final HorizontalFlipNumberController controller;
 
   @override
   State<StatefulWidget> createState() {
@@ -26,6 +30,26 @@ class HorizontalFlipNumber extends StatefulWidget {
 }
 
 class _HorizontalFlipNumberState extends State<HorizontalFlipNumber> {
+  int value = 0;
+  List<FlipNumberController> _numberController = List<FlipNumberController>.empty();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _numberController = List<FlipNumberController>.generate(widget.digits, (index) => FlipNumberController(0));
+    value = widget.controller.value;
+    widget.controller.addListener(_updateValue);
+  }
+
+  void _updateValue() {
+    print("AA ${widget.controller.value}");
+    // setState(() => value = widget.controller.value);
+    for (int i = 0; i < widget.digits; ++i) {
+      _numberController[i].value = ((widget.controller.value / pow(10, widget.digits - i - 1)) % 10).floor();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -37,7 +61,8 @@ class _HorizontalFlipNumberState extends State<HorizontalFlipNumber> {
           return Padding(
             padding: EdgeInsets.fromLTRB(0, 0, widget.gapBetweenDigits, 0),
             child: FlipNumber(
-              value: (widget.value / pow(10, widget.digits - index - 1)).floor() % 10,
+              // value: (value / pow(10, widget.digits - index - 1)).floor() % 10,
+              controller: _numberController[index],
               height: 50,
               width: 30,
             ),
@@ -48,17 +73,23 @@ class _HorizontalFlipNumberState extends State<HorizontalFlipNumber> {
   }
 }
 
+class FlipNumberController extends ValueNotifier<int> {
+  FlipNumberController(super.value);
+}
+
 class FlipNumber extends StatefulWidget {
   const FlipNumber({
     super.key,
-    required this.value,
+    // required this.value,
     required this.width,
     required this.height,
+    required this.controller,
   });
 
-  final int value;
+  // final int value;
   final double width;
   final double height;
+  final FlipNumberController controller;
 
   @override
   State<StatefulWidget> createState() {
@@ -114,20 +145,18 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
             });
           }
         }
-      })
-      ..addListener(() {
-        setState(() {
-          // _running = true;
-        });
       });
     _animation = Tween(begin: _zeroAngle, end: pi / 2).animate(_controller!);
     _controller?.forward(from: 0.0);
+    widget.controller.addListener(onNumberChanged);
   }
 
   void onNumberChanged() {
-    if (widget.value != _oldNumber) {
+    if (_flipStage != 2) return;
+
+    if (widget.controller.value != _oldNumber) {
       int nextNumber = (_oldNumber + 1) % 10;
-      int numberDiff = (widget.value + 10 - nextNumber) % 10;
+      int numberDiff = (widget.controller.value + 10 - nextNumber) % 10;
       int animationDuration = animationTime;
 
       switch (numberDiff) {

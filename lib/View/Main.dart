@@ -24,6 +24,8 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewPageState extends State<MainView> {
+  HorizontalFlipNumberController controller = HorizontalFlipNumberController(123);
+
   @override
   Widget build(BuildContext context) {
     // WordModel model = WordModel(
@@ -100,17 +102,17 @@ class _MainViewPageState extends State<MainView> {
                               const Text("학습중인 단어 : "),
                               const Text("미학습 단어 : "),
                               const Text("장기 기억 단어 : "),
-                              const FlipNumber(
-                                height: 50,
-                                width: 30,
-                                value: 1,
-                              ),
-                              const HorizontalFlipNumber(
-                                digits: 3,
+                              // const FlipNumber(
+                              //   height: 50,
+                              //   width: 30,
+                              //   controller: ,
+                              // ),
+                              HorizontalFlipNumber(
+                                digits: 4,
                                 height: 50,
                                 width: 30,
                                 gapBetweenDigits: 3,
-                                value: 786,
+                                controller: controller,
                               ),
                             ],
                           ),
@@ -187,6 +189,47 @@ class _MainViewPageState extends State<MainView> {
                                 // ),
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
+                                },
+                                child: const Text(
+                                  "Manage Words",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: CommonColors.primaryBackgroundColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color.fromARGB(0x00, 0x00, 0xFF, 0x00),
+                                  width: 2,
+                                ),
+                              ),
+                              child: TextButton(
+                                style: FilledButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  backgroundColor: const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
+                                  shadowColor: Colors.black45.withOpacity(0.55),
+                                  elevation: 20,
+                                ),
+                                // style: ButtonStyle(
+                                //   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                //     RoundedRectangleBorder(
+                                //       borderRadius: BorderRadius.circular(20),
+                                //     ),
+                                //   ),
+                                //   backgroundColor: MaterialStateProperty.all<Color>(
+                                //     const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
+                                //   ),
+                                // ),
+                                onPressed: () {
+                                  controller.value = controller.value + 123;
+                                  // print(controller.value);
                                 },
                                 child: const Text(
                                   "Manage Words",
