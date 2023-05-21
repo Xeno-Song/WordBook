@@ -89,21 +89,21 @@ class _WordAddViewState extends State<WordAddView> {
                     controller: _wordTextEditingController,
                     hint: "Word",
                     errorMessage: wordTextErrorMessage,
-                    foregroundColor: CommonColors.white80,
+                    foregroundColor: CommonColors.menuTextColor,
                     onChanged: (value) => setState(() => wordTextErrorMessage = null),
                   ),
                   CommonTextInputField(
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
                     controller: _pronunciationTextEditingController,
                     hint: "Pronunciation",
-                    foregroundColor: CommonColors.white80,
+                    foregroundColor: CommonColors.menuTextColor,
                   ),
                   CommonTextInputField(
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
                     controller: _meaningTextEditingController,
                     hint: "Meaning",
                     errorMessage: meaningTextErrorMessage,
-                    foregroundColor: CommonColors.white80,
+                    foregroundColor: CommonColors.menuTextColor,
                     onChanged: (value) => setState(() => meaningTextErrorMessage = null),
                   ),
                   Container(
@@ -112,10 +112,10 @@ class _WordAddViewState extends State<WordAddView> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Checkbox(
-                          checkColor: CommonColors.white80,
+                          checkColor: CommonColors.menuTextColor,
                           activeColor: Colors.purple,
-                          side: const BorderSide(
-                            color: CommonColors.white80,
+                          side: BorderSide(
+                            color: CommonColors.menuTextColor,
                             width: 1.5,
                           ),
                           value: _isContinueCreation,
@@ -129,9 +129,9 @@ class _WordAddViewState extends State<WordAddView> {
                           onTap: () => setState(() {
                             _isContinueCreation = !_isContinueCreation;
                           }),
-                          child: const Text(
+                          child: Text(
                             style: TextStyle(
-                              color: CommonColors.white80,
+                              color: CommonColors.menuTextColor,
                             ),
                             "Continous generation",
                           ),
@@ -184,7 +184,12 @@ class _WordAddViewState extends State<WordAddView> {
                     onPressed: () {
                       createNewWord();
                     },
-                    child: const Text("Create"),
+                    child: Text(
+                      "Create",
+                      style: TextStyle(
+                        color: CommonColors.secondaryForegroundColor,
+                      ),
+                    ),
                   ),
                 ],
               ),

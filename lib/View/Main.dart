@@ -47,7 +47,21 @@ class _MainViewPageState extends State<MainView> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const ApplicationDrawer(),
-      appBar: CommonAppBar.build(),
+      appBar: CommonAppBar.build(
+        <Widget>[
+          IconButton(
+            icon: Icon(CommonColors.isDark ? Icons.dark_mode : Icons.light_mode),
+            onPressed: () {
+              // CommonColors.isDark = CommonColors.isDark == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+
+              setState(() {
+                CommonColors.setTheme(!CommonColors.isDark);
+                print("isDark : ${CommonColors.isDark}");
+              });
+            },
+          )
+        ],
+      ),
       body: ConstrainedBox(
         constraints: const BoxConstraints(
           minHeight: 300,
@@ -93,8 +107,7 @@ class _MainViewPageState extends State<MainView> {
                           color: CommonColors.secondaryBackgroundColor,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black45.withOpacity(0.55),
-                              spreadRadius: 5,
+                              color: Colors.black45.withOpacity(0.20),
                               blurRadius: 10,
                             ),
                           ],
@@ -121,7 +134,7 @@ class _MainViewPageState extends State<MainView> {
                                 labelWidth: 110,
                                 label: "등록된 단어",
                                 controller: registerWordsIndicatorController,
-                                labelStyle: const TextStyle(
+                                labelStyle: TextStyle(
                                   fontSize: 16,
                                   color: CommonColors.primaryForegroundColor,
                                 ),
@@ -130,7 +143,7 @@ class _MainViewPageState extends State<MainView> {
                                 labelWidth: 110,
                                 label: "미학습 단어",
                                 controller: unlearnedWordsIndicatorController,
-                                labelStyle: const TextStyle(
+                                labelStyle: TextStyle(
                                   fontSize: 16,
                                   color: CommonColors.primaryForegroundColor,
                                 ),
@@ -139,7 +152,7 @@ class _MainViewPageState extends State<MainView> {
                                 labelWidth: 110,
                                 label: "학습중인 단어",
                                 controller: learningWordsIndicatorController,
-                                labelStyle: const TextStyle(
+                                labelStyle: TextStyle(
                                   fontSize: 16,
                                   color: CommonColors.primaryForegroundColor,
                                 ),
@@ -148,7 +161,7 @@ class _MainViewPageState extends State<MainView> {
                                 labelWidth: 110,
                                 label: "장기 기억 단어",
                                 controller: longDurationWordsIndicatorController,
-                                labelStyle: const TextStyle(
+                                labelStyle: TextStyle(
                                   fontSize: 16,
                                   color: CommonColors.primaryForegroundColor,
                                 ),
@@ -167,31 +180,23 @@ class _MainViewPageState extends State<MainView> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color.fromARGB(0x00, 0x00, 0xFF, 0x00),
-                                  width: 2,
+                            child: TextButton(
+                              style: FilledButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
+                                backgroundColor: const Color.fromARGB(0x90, 0x4F, 0xA3, 0xFF),
+                                shadowColor: Colors.black45.withOpacity(0.55),
+                                elevation: 20,
                               ),
-                              child: TextButton(
-                                style: FilledButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  backgroundColor: const Color.fromARGB(0xFF, 0xBC, 0xDC, 0xFF),
-                                  shadowColor: Colors.black45.withOpacity(0.55),
-                                  elevation: 20,
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FlashcardView()));
-                                },
-                                child: const Text(
-                                  "Flash Card",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: CommonColors.primaryBackgroundColor,
-                                  ),
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FlashcardView()));
+                              },
+                              child: Text(
+                                "Flash Card",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: CommonColors.menuTextColor,
                                 ),
                               ),
                             ),
@@ -200,41 +205,23 @@ class _MainViewPageState extends State<MainView> {
                             height: 10,
                           ),
                           Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color.fromARGB(0x00, 0x00, 0xFF, 0x00),
-                                  width: 2,
+                            child: TextButton(
+                              style: FilledButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
+                                backgroundColor: const Color.fromARGB(0xB0, 0x97, 0x69, 0xFF),
+                                shadowColor: Colors.black45.withOpacity(0.55),
+                                elevation: 20,
                               ),
-                              child: TextButton(
-                                style: FilledButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  backgroundColor: const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
-                                  shadowColor: Colors.black45.withOpacity(0.55),
-                                  elevation: 20,
-                                ),
-                                // style: ButtonStyle(
-                                //   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                //     RoundedRectangleBorder(
-                                //       borderRadius: BorderRadius.circular(20),
-                                //     ),
-                                //   ),
-                                //   backgroundColor: MaterialStateProperty.all<Color>(
-                                //     const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
-                                //   ),
-                                // ),
-                                onPressed: () {
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
-                                },
-                                child: const Text(
-                                  "Manage Words",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: CommonColors.primaryBackgroundColor,
-                                  ),
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
+                              },
+                              child: Text(
+                                "Manage Words",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: CommonColors.menuTextColor,
                                 ),
                               ),
                             ),

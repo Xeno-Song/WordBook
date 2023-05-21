@@ -23,12 +23,12 @@ class ApplicationDrawer extends StatelessWidget {
             currentAccountPicture: CircleAvatar(backgroundImage: AssetImage('assets/image/icon.jpg')),
           ),
           ListTile(
-            leading: const Icon(
+            leading: Icon(
               Icons.apps,
-              color: Colors.white70,
+              color: CommonColors.menuTextColor,
             ),
             title: const Text('Main'),
-            textColor: Colors.white70,
+            textColor: CommonColors.menuTextColor,
             style: ListTileStyle.drawer,
             onTap: () {
               _closeDrawer(context);
@@ -36,24 +36,24 @@ class ApplicationDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(
+            leading: Icon(
               Icons.copy,
-              color: Colors.white70,
+              color: CommonColors.menuTextColor,
             ),
             title: const Text('Flash Card'),
-            textColor: Colors.white70,
+            textColor: CommonColors.menuTextColor,
             onTap: () {
               _closeDrawer(context);
               Navigator.of(context).push(MaterialPageRoute(builder: (_) => FlashcardView()));
             },
           ),
           ListTile(
-            leading: const Icon(
+            leading: Icon(
               Icons.copy,
-              color: Colors.white70,
+              color: CommonColors.menuTextColor,
             ),
             title: const Text('Manage WordSet'),
-            textColor: Colors.white70,
+            textColor: CommonColors.menuTextColor,
             onTap: () {
               _closeDrawer(context);
               Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));

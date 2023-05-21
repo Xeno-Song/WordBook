@@ -136,9 +136,9 @@ class FlashcardViewState extends State<FlashcardView> {
         height: double.infinity,
         alignment: Alignment.center,
         color: CommonColors.primaryBackgroundColor,
-        child: const SpinKitFoldingCube(
-          color: Colors.white,
-          duration: Duration(seconds: 4),
+        child: SpinKitFoldingCube(
+          color: CommonColors.secondaryForegroundColor,
+          duration: const Duration(seconds: 4),
           size: 50.0,
         ),
       );
@@ -247,7 +247,7 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
 
   void onCorrectChoice() {
     _colorTween = ColorTween(
-      begin: const Color.fromARGB(0xFF, 0x19, 0x51, 0x18),
+      begin: CommonColors.colorCorrect,
       end: CommonColors.secondaryBackgroundColor,
     ).animate(_animationController!);
     _animationController?.forward(from: 0.0);
@@ -257,7 +257,7 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
 
   void onWrongChoice() {
     _colorTween = ColorTween(
-      begin: const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D),
+      begin: CommonColors.colorWrong,
       end: CommonColors.secondaryBackgroundColor,
     ).animate(_animationController!);
     _animationController?.forward(from: 0.0);
@@ -371,8 +371,8 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
                     child: Center(
                       child: Text(
                         widget.dataObject!.model.word,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: CommonColors.primaryForegroundColor,
                           fontSize: 40,
                         ),
                       ),
@@ -388,9 +388,9 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
                           Color buttonColor = const Color.fromARGB(50, 20, 20, 20);
                           if (selectedItemIndex != -1) {
                             if (widget.dataObject!.answerIndex == index) {
-                              buttonColor = const Color.fromARGB(0xFF, 0x19, 0x51, 0x18);
+                              buttonColor = CommonColors.colorCorrect;
                             } else if (index == selectedItemIndex) {
-                              buttonColor = const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D);
+                              buttonColor = CommonColors.colorWrong;
                             }
                           }
 
@@ -436,8 +436,8 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
               child: Center(
                 child: Text(
                   widget.dataObject!.model.pronunciation,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: CommonColors.primaryForegroundColor,
                     fontSize: 30,
                   ),
                 ),
@@ -446,8 +446,8 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
             Center(
               child: Text(
                 widget.dataObject!.model.meaning,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: CommonColors.primaryForegroundColor,
                   fontSize: 30,
                 ),
               ),
@@ -524,7 +524,7 @@ class _ChoiceButtonState extends State<ChoiceButton> {
             height: double.infinity,
             child: Text(
               widget.text!,
-              style: const TextStyle(
+              style: TextStyle(
                 color: CommonColors.primaryForegroundColor,
                 // color: Colors.white,
               ),

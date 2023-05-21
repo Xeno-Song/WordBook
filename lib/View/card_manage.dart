@@ -170,14 +170,19 @@ class _CardManageViewPageState extends State<CardManageView> {
                         )
                       },
                       style: TextButton.styleFrom(
-                        backgroundColor: CommonColors.secondaryBackgroundColor,
+                        backgroundColor: CommonColors.coloredBackgroundColor,
                       ),
-                      child: const Text("<"),
+                      child: Text(
+                        "<",
+                        style: TextStyle(
+                          color: CommonColors.menuTextColor,
+                        ),
+                      ),
                     ),
                     Text(
                       "    $currentPage / $maxPage    ",
-                      style: const TextStyle(
-                        color: CommonColors.primaryForegroundColor,
+                      style: TextStyle(
+                        color: CommonColors.menuTextColor,
                       ),
                     ),
                     TextButton(
@@ -189,9 +194,14 @@ class _CardManageViewPageState extends State<CardManageView> {
                         )
                       },
                       style: TextButton.styleFrom(
-                        backgroundColor: CommonColors.secondaryBackgroundColor,
+                        backgroundColor: CommonColors.coloredBackgroundColor,
                       ),
-                      child: const Text(">"),
+                      child: Text(
+                        ">",
+                        style: TextStyle(
+                          color: CommonColors.menuTextColor,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -278,19 +288,19 @@ class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
             onTap: () {},
             title: Text(dataIndex.word),
             subtitle: Text(dataIndex.meaning),
-            textColor: Colors.white,
+            textColor: CommonColors.menuTextColor,
             leading: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(
                   Icons.copy,
-                  color: Colors.white,
+                  color: CommonColors.menuTextColor,
                 ),
               ],
             ),
             trailing: PopupMenuButton(
-              color: Colors.white,
+              color: CommonColors.menuTextColor,
               itemBuilder: (BuildContext context) => <PopupMenuEntry>[
                 const PopupMenuItem(
                   textStyle: TextStyle(
