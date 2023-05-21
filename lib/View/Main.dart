@@ -8,6 +8,7 @@ import 'package:word_book/model/WordTestModel.dart';
 import 'package:word_book/services/database_service.dart';
 
 import '../model/WordModel.dart';
+import '../services/flashcard_service.dart';
 import '../services/word_service.dart';
 import 'card_manage.dart';
 import 'components/common/appbar.dart';
@@ -25,22 +26,24 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewPageState extends State<MainView> {
-  HorizontalFlipNumberController controller = HorizontalFlipNumberController(123);
+  HorizontalFlipNumberController registerWordsIndicatorController = HorizontalFlipNumberController(123);
+  HorizontalFlipNumberController learningWordsIndicatorController = HorizontalFlipNumberController(123);
+  HorizontalFlipNumberController unlearnedWordsIndicatorController = HorizontalFlipNumberController(123);
+  HorizontalFlipNumberController longDurationWordsIndicatorController = HorizontalFlipNumberController(123);
+
+  final WordService _service = WordService();
+
+  @override
+  void initState() {
+    super.initState();
+    // registerWordsIndicatorController.value =
+    _service.getAllCount().then((value) {
+      registerWordsIndicatorController.value = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // WordModel model = WordModel(
-    //   0,
-    //   "this.word",
-    //   "this.meaning",
-    //   "this.pronunciation",
-    //   List<WordTestModel>.filled(3, WordTestModel(0, "OK", DateTime.now())),
-    //   DateTime.now(),
-    //   DateTime.now(),
-    //   DateTime.now(),
-    // );
-    // print(model.toMap());
-
     return Scaffold(
       drawer: const ApplicationDrawer(),
       appBar: CommonAppBar.build(),
@@ -99,34 +102,54 @@ class _MainViewPageState extends State<MainView> {
                           width: double.infinity,
                           height: double.infinity,
                           padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                          alignment: Alignment.centerLeft,
+                          alignment: Alignment.center,
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text("등록된 단어 : "),
-                              const Text("학습중인 단어 : "),
-                              const Text("미학습 단어 : "),
-                              const Text("장기 기억 단어 : "),
+                              // const Text("등록된 단어 : "),
+                              // const Text("학습중인 단어 : "),
+                              // const Text("미학습 단어 : "),
+                              // const Text("장기 기억 단어 : "),
                               // const FlipNumber(
                               //   height: 50,
                               //   width: 30,
                               //   controller: ,
                               // ),
-                              HorizontalFlipNumber(
-                                digits: 4,
-                                height: 50,
-                                width: 30,
-                                gapBetweenDigits: 3,
-                                controller: controller,
+                              LabeledNumberIndicator(
+                                labelWidth: 110,
+                                label: "등록된 단어",
+                                controller: registerWordsIndicatorController,
+                                labelStyle: const TextStyle(
+                                  fontSize: 16,
+                                  color: CommonColors.primaryForegroundColor,
+                                ),
                               ),
                               LabeledNumberIndicator(
-                                labelWidth: 80,
-                                label: "등록된 단어",
-                                controller: controller,
+                                labelWidth: 110,
+                                label: "학습중인 단어",
+                                controller: learningWordsIndicatorController,
                                 labelStyle: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white,
+                                  fontSize: 16,
+                                  color: CommonColors.primaryForegroundColor,
+                                ),
+                              ),
+                              LabeledNumberIndicator(
+                                labelWidth: 110,
+                                label: "미학습 단어",
+                                controller: unlearnedWordsIndicatorController,
+                                labelStyle: const TextStyle(
+                                  fontSize: 16,
+                                  color: CommonColors.primaryForegroundColor,
+                                ),
+                              ),
+                              LabeledNumberIndicator(
+                                labelWidth: 110,
+                                label: "장기 기억 단어",
+                                controller: longDurationWordsIndicatorController,
+                                labelStyle: const TextStyle(
+                                  fontSize: 16,
+                                  color: CommonColors.primaryForegroundColor,
                                 ),
                               ),
                             ],
@@ -204,47 +227,6 @@ class _MainViewPageState extends State<MainView> {
                                 // ),
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
-                                },
-                                child: const Text(
-                                  "Manage Words",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: CommonColors.primaryBackgroundColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color.fromARGB(0x00, 0x00, 0xFF, 0x00),
-                                  width: 2,
-                                ),
-                              ),
-                              child: TextButton(
-                                style: FilledButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  backgroundColor: const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
-                                  shadowColor: Colors.black45.withOpacity(0.55),
-                                  elevation: 20,
-                                ),
-                                // style: ButtonStyle(
-                                //   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                //     RoundedRectangleBorder(
-                                //       borderRadius: BorderRadius.circular(20),
-                                //     ),
-                                //   ),
-                                //   backgroundColor: MaterialStateProperty.all<Color>(
-                                //     const Color.fromARGB(0xFF, 0xD0, 0xBC, 0xFF),
-                                //   ),
-                                // ),
-                                onPressed: () {
-                                  controller.value = controller.value + 123;
-                                  // print(controller.value);
                                 },
                                 child: const Text(
                                   "Manage Words",
@@ -351,7 +333,7 @@ class _LabelNumberIndicatorState extends State<LabeledNumberIndicator> {
         HorizontalFlipNumber(
           digits: 5,
           height: 50,
-          width: 30,
+          width: 25,
           gapBetweenDigits: 3,
           controller: widget.controller,
         ),

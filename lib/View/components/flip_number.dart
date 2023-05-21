@@ -63,8 +63,8 @@ class _HorizontalFlipNumberState extends State<HorizontalFlipNumber> {
             child: FlipNumber(
               // value: (value / pow(10, widget.digits - index - 1)).floor() % 10,
               controller: _numberController[index],
-              height: 50,
-              width: 30,
+              height: widget.height,
+              width: widget.width,
             ),
           );
         },
@@ -198,6 +198,7 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
                 value: _newNumber,
                 width: widget.width,
                 height: widget.height / 2,
+                outlineColor: Colors.white70,
               ),
               Padding(
                 // upper old
@@ -213,6 +214,7 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
                       value: _oldNumber,
                       width: widget.width,
                       height: widget.height / 2,
+                      outlineColor: Colors.white70,
                     ),
                   ),
                 ),
@@ -225,6 +227,7 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
                   width: widget.width,
                   height: widget.height / 2,
                   isUpper: false,
+                  outlineColor: Colors.white70,
                 ),
               ),
               Padding(
@@ -240,6 +243,7 @@ class _FlipNumberState extends State<FlipNumber> with TickerProviderStateMixin {
                     width: widget.width,
                     height: widget.height / 2,
                     isUpper: false,
+                    outlineColor: Colors.white70,
                   ),
                 ),
               ),
@@ -314,7 +318,7 @@ class _FlipNumberIndex extends StatelessWidget {
                   value.toString(),
                   style: TextStyle(
                     fontSize: height * _textSizeRatio,
-                    color: Colors.white,
+                    color: const Color.fromARGB(0xF0, 0xFF, 0xFF, 0xFF),
                   ),
                 ),
               ),
