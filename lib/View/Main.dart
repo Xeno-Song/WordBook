@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:word_book/View/components/common/colors.dart';
@@ -43,7 +44,12 @@ class _MainViewPageState extends State<MainView> {
     return Scaffold(
       drawer: const ApplicationDrawer(),
       appBar: CommonAppBar.build(),
-      body: _buildBody(context),
+      body: ConstrainedBox(
+        constraints: const BoxConstraints(
+          minHeight: 300,
+        ),
+        child: _buildBody(context),
+      ),
     );
   }
 

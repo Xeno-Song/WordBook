@@ -1,12 +1,20 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:word_book/View/card_manage.dart';
 import 'package:word_book/View/components/common/appbar.dart';
 import 'package:word_book/View/main.dart';
 
 import 'View/components/common/drawer.dart';
 
-void main() {
-  print("Test Hello World!");
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  if (Platform.isWindows) {
+    WindowManager.instance.setMinimumSize(const Size(350, 600));
+  }
+
   runApp(const MyApp());
 }
 
