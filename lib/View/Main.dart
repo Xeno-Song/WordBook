@@ -37,9 +37,10 @@ class _MainViewPageState extends State<MainView> {
   void initState() {
     super.initState();
     // registerWordsIndicatorController.value =
-    _service.getAllCount().then((value) {
-      registerWordsIndicatorController.value = value;
-    });
+    _service.getAllCount().then((value) => registerWordsIndicatorController.value = value);
+    _service.getLearningWordCount().then((value) => learningWordsIndicatorController.value = value);
+    _service.getUnlearnedWordCount().then((value) => unlearnedWordsIndicatorController.value = value);
+    _service.getLongMemoryWordCount().then((value) => longDurationWordsIndicatorController.value = value);
   }
 
   @override
@@ -127,8 +128,8 @@ class _MainViewPageState extends State<MainView> {
                               ),
                               LabeledNumberIndicator(
                                 labelWidth: 110,
-                                label: "학습중인 단어",
-                                controller: learningWordsIndicatorController,
+                                label: "미학습 단어",
+                                controller: unlearnedWordsIndicatorController,
                                 labelStyle: const TextStyle(
                                   fontSize: 16,
                                   color: CommonColors.primaryForegroundColor,
@@ -136,8 +137,8 @@ class _MainViewPageState extends State<MainView> {
                               ),
                               LabeledNumberIndicator(
                                 labelWidth: 110,
-                                label: "미학습 단어",
-                                controller: unlearnedWordsIndicatorController,
+                                label: "학습중인 단어",
+                                controller: learningWordsIndicatorController,
                                 labelStyle: const TextStyle(
                                   fontSize: 16,
                                   color: CommonColors.primaryForegroundColor,

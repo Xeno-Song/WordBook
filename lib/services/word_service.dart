@@ -43,6 +43,34 @@ class WordService {
     return List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
   }
 
+  Future<int> getLearningWordCount() async {
+    await _waitForTableCheck();
+
+    var connection = await DatabaseService.database;
+    var rawResult = await connection.rawQuery('SELECT COUNT(*) FROM $_tableName WHERE nextTestDate not null');
+
+    return int.parse(rawResult[0]["COUNT(*)"].toString());
+  }
+
+  Future<int> getUnlearnedWordCount() async {
+    await _waitForTableCheck();
+
+    var connection = await DatabaseService.database;
+    var rawResult = await connection.rawQuery('SELECT COUNT(*) FROM $_tableName WHERE nextTestDate is null');
+
+    return int.parse(rawResult[0]["COUNT(*)"].toString());
+  }
+
+  Future<int> getLongMemoryWordCount() async {
+    await _waitForTableCheck();
+
+    var connection = await DatabaseService.database;
+    var rawResult = await connection.rawQuery(
+        'SELECT COUNT(*) FROM $_tableName WHERE nextTestDate > "${DateTimeFormatter.format(DateTime.now().add(Duration(days: 30)))}"');
+
+    return int.parse(rawResult[0]["COUNT(*)"].toString());
+  }
+
   Future<List<WordModel>> getDataLimit(int offset, int limit) async {
     await _waitForTableCheck();
 

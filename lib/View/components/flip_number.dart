@@ -43,7 +43,7 @@ class _HorizontalFlipNumberState extends State<HorizontalFlipNumber> {
   }
 
   void _updateValue() {
-    print("AA ${widget.controller.value}");
+    // print("AA ${widget.controller.value}");
     // setState(() => value = widget.controller.value);
     for (int i = 0; i < widget.digits; ++i) {
       _numberController[i].value = ((widget.controller.value / pow(10, widget.digits - i - 1)) % 10).floor();
