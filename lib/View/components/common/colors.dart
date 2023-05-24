@@ -22,7 +22,7 @@ class CommonColors {
   static Color colorCorrect = const Color.fromARGB(0xFF, 0x19, 0x51, 0x18);
   static Color colorWrong = const Color.fromARGB(0xFF, 0x5C, 0x1C, 0x1D);
 
-  static bool isDark = false;
+  static bool isDark = true;
 
   static void setTheme(bool isDark) {
     CommonColors.isDark = isDark;
