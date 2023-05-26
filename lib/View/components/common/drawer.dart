@@ -5,7 +5,12 @@ import 'package:word_book/View/components/common/colors.dart';
 import 'package:word_book/View/flashcard.dart';
 
 class ApplicationDrawer extends StatelessWidget {
-  const ApplicationDrawer({super.key});
+  const ApplicationDrawer({
+    super.key,
+    this.onPageChanged,
+  });
+
+  final Function? onPageChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +49,10 @@ class ApplicationDrawer extends StatelessWidget {
             textColor: CommonColors.menuTextColor,
             onTap: () {
               _closeDrawer(context);
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => FlashcardView()));
+              onPageChanged?.call();
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => FlashcardView()))
+                  .then((value) => onPageChanged?.call());
             },
           ),
           ListTile(
@@ -56,7 +64,9 @@ class ApplicationDrawer extends StatelessWidget {
             textColor: CommonColors.menuTextColor,
             onTap: () {
               _closeDrawer(context);
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => CardManageView()))
+                  .then((value) => onPageChanged?.call());
             },
           ),
         ],

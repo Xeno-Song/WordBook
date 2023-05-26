@@ -17,7 +17,12 @@ import 'components/flip_number.dart';
 import 'flashcard.dart';
 
 class MainView extends StatefulWidget {
-  const MainView({super.key});
+  const MainView({
+    super.key,
+    required this.routeObserver,
+  });
+
+  final RouteObserver<PageRoute> routeObserver;
 
   @override
   State<StatefulWidget> createState() {
@@ -25,18 +30,30 @@ class MainView extends StatefulWidget {
   }
 }
 
-class _MainViewPageState extends State<MainView> {
-  HorizontalFlipNumberController registerWordsIndicatorController = HorizontalFlipNumberController(123);
-  HorizontalFlipNumberController learningWordsIndicatorController = HorizontalFlipNumberController(123);
-  HorizontalFlipNumberController unlearnedWordsIndicatorController = HorizontalFlipNumberController(123);
-  HorizontalFlipNumberController longDurationWordsIndicatorController = HorizontalFlipNumberController(123);
+class _MainViewPageState extends State<MainView> with RouteAware {
+  HorizontalFlipNumberController registerWordsIndicatorController = HorizontalFlipNumberController(0);
+  HorizontalFlipNumberController learningWordsIndicatorController = HorizontalFlipNumberController(0);
+  HorizontalFlipNumberController unlearnedWordsIndicatorController = HorizontalFlipNumberController(0);
+  HorizontalFlipNumberController longDurationWordsIndicatorController = HorizontalFlipNumberController(0);
 
   final WordService _service = WordService();
+  bool _pageChanged = false;
 
   @override
   void initState() {
     super.initState();
-    // registerWordsIndicatorController.value =
+    updateCounts();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    widget.routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute<dynamic>);
+  }
+
+  void updateCounts() {
+    // print("Count updated!!");
+
     _service.getAllCount().then((value) => registerWordsIndicatorController.value = value);
     _service.getLearningWordCount().then((value) => learningWordsIndicatorController.value = value);
     _service.getUnlearnedWordCount().then((value) => unlearnedWordsIndicatorController.value = value);
@@ -45,15 +62,20 @@ class _MainViewPageState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
+    if (_pageChanged == true) {
+      _pageChanged = false;
+      updateCounts();
+    }
+
     return Scaffold(
-      drawer: const ApplicationDrawer(),
+      drawer: ApplicationDrawer(onPageChanged: () {
+        setState(() => _pageChanged = true);
+      }),
       appBar: CommonAppBar.build(
         <Widget>[
           IconButton(
             icon: Icon(CommonColors.isDark ? Icons.dark_mode : Icons.light_mode),
             onPressed: () {
-              // CommonColors.isDark = CommonColors.isDark == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-
               setState(() {
                 CommonColors.setTheme(!CommonColors.isDark);
                 print("isDark : ${CommonColors.isDark}");
