@@ -126,7 +126,7 @@ class _CardManageViewPageState extends State<CardManageView> {
         data.word = word;
         data.meaning = meaning;
         data.pronunciation = pronunciation;
-        data.createDate = data.modifyDate = data.nextTestDate = DateTime.now();
+        data.createDate = data.modifyDate = DateTime.now();
 
         await Future.doWhile(() async {
           if (insertTasks > 9) {

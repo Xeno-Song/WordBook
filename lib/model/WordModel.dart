@@ -35,7 +35,7 @@ class WordModel {
         DateTime(0, 0, 0, 0, 0, 0),
         DateTime(0, 0, 0, 0, 0, 0),
         0,
-        DateTime(0, 0, 0, 0, 0, 0),
+        null,
       );
 
   Map<String, dynamic> toMap() {
