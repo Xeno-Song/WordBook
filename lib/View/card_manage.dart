@@ -165,6 +165,13 @@ class _CardManageViewPageState extends State<CardManageView> {
       );
       setState(() => addRemaningWords = 0);
       updateMaxPage();
+    }).catchError((ex) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid file format'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     });
   }
 
