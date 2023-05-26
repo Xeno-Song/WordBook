@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:word_book/View/components/common/appbar.dart';
 import 'package:word_book/View/components/common/colors.dart';
@@ -25,6 +29,7 @@ class _CardManageViewPageState extends State<CardManageView> {
   final WordService _service = WordService();
   int currentPage = 1;
   int maxPage = 1;
+  int addRemaningWords = 0;
   ListingCondition _listingCondition = ListingCondition.createDateAsc;
 
   @override
@@ -85,6 +90,84 @@ class _CardManageViewPageState extends State<CardManageView> {
     print("Dummy data creation complete.");
   }
 
+  void loadCsvFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: [
+        "csv",
+      ],
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    File(result.files.first.path!).readAsString().then((String contents) async {
+      // print('File Contents\n---------------');
+      // print(contents);
+      var lines = contents.split('\n');
+      addRemaningWords = lines.length - 1;
+
+      int insertTasks = 0;
+
+      for (int i = 1; i < lines.length; ++i) {
+        var datas = lines[i].split(',');
+        if (datas.length != 3) {
+          setState(() => addRemaningWords = addRemaningWords - 1);
+          continue;
+        }
+
+        String word = datas[0]; // Word
+        String meaning = datas[1]; // Meaning
+        String pronunciation = datas[2]; // pronunciation
+
+        // Add word
+        WordModel data = WordModel.empty();
+        data.word = word;
+        data.meaning = meaning;
+        data.pronunciation = pronunciation;
+        data.createDate = data.modifyDate = data.nextTestDate = DateTime.now();
+
+        await Future.doWhile(() async {
+          if (insertTasks > 9) {
+            await Future.delayed(const Duration(seconds: 1));
+            return true;
+          }
+
+          return false;
+        });
+
+        insertTasks = insertTasks + 1;
+        _service.insertModel(data).then(
+              (value) => setState(
+                () {
+                  insertTasks = insertTasks - 1;
+                  addRemaningWords = addRemaningWords - 1;
+                },
+              ),
+            );
+      }
+
+      await Future.doWhile(() async {
+        if (insertTasks != 0) {
+          await Future.delayed(const Duration(seconds: 1));
+          return true;
+        }
+
+        return false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${lines.length} word added'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      setState(() => addRemaningWords = 0);
+      updateMaxPage();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
@@ -107,15 +190,24 @@ class _CardManageViewPageState extends State<CardManageView> {
               onSelected: (String value) => onSelectedSortRuleChanged(ListingConditionConverter.convertToEnum(value)),
             ),
             PopupMenuButton<String>(
-              onSelected: (value) {
+              onSelected: (value) async {
                 if (value == 'Add') {
                   Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WordAddView()));
                 } else if (value == 'Create Dummy') {
                   createDummyData(10000);
+                } else if (value == 'Load CSV') {
+                  loadCsvFile();
+                } else if (value == 'Test') {
+                  setState(() {
+                    addRemaningWords = addRemaningWords + 1;
+                  });
                 }
               },
               itemBuilder: (BuildContext context) {
-                return {'Add', 'Create Dummy'}.map((String choice) {
+                return {
+                  'Add',
+                  'Load CSV', /*'Create Dummy', 'Test'*/
+                }.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
                     child: Text(choice),
@@ -129,84 +221,118 @@ class _CardManageViewPageState extends State<CardManageView> {
           color: CommonColors.primaryBackgroundColor,
           height: double.infinity,
           width: double.infinity,
-          child: Column(
-            children: [
-              Expanded(
-                child: FutureBuilder(
-                  future: _service.getData(
-                      offset: (currentPage - 1) * 100,
-                      limit: 100,
-                      order: ListingConditionConverter.convertToQuery(_listingCondition)),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const SpinKitFoldingCube(
-                        color: Colors.white,
-                        duration: Duration(seconds: 4),
-                        size: 50,
-                      );
-                    }
-                    return CardManageItemBuilder(
-                      service: _service,
-                      offset: (currentPage - 1) * 100,
-                      count: 100,
-                      onTrailingTap: handleWordItemTrailingMenuTap,
-                      data: snapshot.data!,
-                    );
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 50,
-                width: double.maxFinite,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton(
-                      onPressed: () => {
-                        setState(
-                          () {
-                            if (currentPage > 1) currentPage--;
+          child: Stack(
+            children: List<Widget>.generate(
+              (addRemaningWords == 0 ? 1 : 2),
+              (index) {
+                if (index == 0) {
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: FutureBuilder(
+                          future: _service.getData(
+                              offset: (currentPage - 1) * 100,
+                              limit: 100,
+                              order: ListingConditionConverter.convertToQuery(_listingCondition)),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const SpinKitFoldingCube(
+                                color: Colors.white,
+                                duration: Duration(seconds: 4),
+                                size: 50,
+                              );
+                            }
+                            return CardManageItemBuilder(
+                              service: _service,
+                              offset: (currentPage - 1) * 100,
+                              count: 100,
+                              onTrailingTap: handleWordItemTrailingMenuTap,
+                              data: snapshot.data!,
+                            );
                           },
-                        )
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: CommonColors.coloredBackgroundColor,
-                      ),
-                      child: Text(
-                        "<",
-                        style: TextStyle(
-                          color: CommonColors.menuTextColor,
                         ),
                       ),
-                    ),
-                    Text(
-                      "    $currentPage / $maxPage    ",
-                      style: TextStyle(
-                        color: CommonColors.menuTextColor,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => {
-                        setState(
-                          () {
-                            if (currentPage < maxPage) currentPage++;
-                          },
-                        )
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: CommonColors.coloredBackgroundColor,
-                      ),
-                      child: Text(
-                        ">",
-                        style: TextStyle(
-                          color: CommonColors.menuTextColor,
+                      SizedBox(
+                        height: 50,
+                        width: double.maxFinite,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () => {
+                                setState(
+                                  () {
+                                    if (currentPage > 1) currentPage--;
+                                  },
+                                )
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor: CommonColors.coloredBackgroundColor,
+                              ),
+                              child: Text(
+                                "<",
+                                style: TextStyle(
+                                  color: CommonColors.menuTextColor,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              "    $currentPage / $maxPage    ",
+                              style: TextStyle(
+                                color: CommonColors.menuTextColor,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => {
+                                setState(
+                                  () {
+                                    if (currentPage < maxPage) currentPage++;
+                                  },
+                                )
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor: CommonColors.coloredBackgroundColor,
+                              ),
+                              child: Text(
+                                ">",
+                                style: TextStyle(
+                                  color: CommonColors.menuTextColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                    ],
+                  );
+                } else {
+                  return Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.black87,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SpinKitWave(
+                          color: CommonColors.secondaryForegroundColor,
+                          duration: const Duration(seconds: 2),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                          child: Text(
+                            "Adding words...  $addRemaningWords",
+                            style: TextStyle(
+                              color: CommonColors.secondaryForegroundColor,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ],
+                  );
+                }
+              },
+            ),
           ),
         ),
       );
