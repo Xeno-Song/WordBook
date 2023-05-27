@@ -154,7 +154,7 @@ class WordService {
     return List.generate(raw.length, (index) => WordModel.fromMap(raw[index]));
   }
 
-  Future<List<String>> getRandomWordString(int limit, List<WordModel>? excludes) async {
+  Future<List<String>> getRandomMeaningString(int limit, List<WordModel>? excludes) async {
     await _waitForTableCheck();
 
     var connection = await DatabaseService.database;
@@ -177,7 +177,7 @@ class WordService {
       limit: limit,
     );
 
-    return List.generate(raw.length, (index) => raw[index]['word'].toString());
+    return List.generate(raw.length, (index) => raw[index]['meaning'].toString());
   }
 
   Future<void> insertModel(WordModel model) async {

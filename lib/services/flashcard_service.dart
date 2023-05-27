@@ -23,8 +23,9 @@ class FlashcardService {
     return modelList;
   }
 
-  Future<List<String>> getRandomWordString(int limit, WordModel exclude) async {
-    List<String> wordList = await _service.getRandomWordString(limit, List<WordModel>.generate(1, (index) => exclude));
+  Future<List<String>> getRandomMeaningString(int limit, WordModel exclude) async {
+    List<String> wordList =
+        await _service.getRandomMeaningString(limit, List<WordModel>.generate(1, (index) => exclude));
     return wordList;
   }
 

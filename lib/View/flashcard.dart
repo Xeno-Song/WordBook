@@ -20,7 +20,7 @@ import 'components/common/drawer.dart';
 
 class FlashcardObject {
   FlashcardObject(this.model, this.choices) {
-    choices = <String>[model.word] + choices;
+    choices = <String>[model.meaning] + choices;
     choices.shuffle();
 
     answerIndex = choices.indexOf(model.word);
@@ -57,7 +57,7 @@ class FlashcardViewState extends State<FlashcardView> {
 
     _service.getNextWord(limit: 3).then((list) {
       list?.forEach((element) {
-        _service.getRandomWordString(3, element).then((value) {
+        _service.getRandomMeaningString(3, element).then((value) {
           setState(() {
             _waitingWords.add(FlashcardObject(element, value));
           });
@@ -88,7 +88,7 @@ class FlashcardViewState extends State<FlashcardView> {
       excludeId: List<int>.generate(_waitingWords.length, (index) => _waitingWords[index].model.id),
     )
         .then((word) {
-      _service.getRandomWordString(3, word![0]).then((value) {
+      _service.getRandomMeaningString(3, word![0]).then((value) {
         setState(() {
           _waitingWords.add(FlashcardObject(word[0], value));
         });
