@@ -23,7 +23,7 @@ class FlashcardObject {
     choices = <String>[model.meaning] + choices;
     choices.shuffle();
 
-    answerIndex = choices.indexOf(model.word);
+    answerIndex = choices.indexOf(model.meaning);
 
     testable = model.testResult.isNotEmpty;
     tested = false;
@@ -237,7 +237,8 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
     setState(() => selectedItemIndex = choiceIndex);
 
     // . widget.questionOptions[choiceIndex];
-    String correctWord = widget.dataObject!.model.word;
+    String correctWord = widget.dataObject!.model.meaning;
+
     if (correctWord == widget.dataObject!.choices[choiceIndex]) {
       onCorrectChoice();
     } else {
@@ -251,6 +252,8 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
       end: CommonColors.secondaryBackgroundColor,
     ).animate(_animationController!);
     _animationController?.forward(from: 0.0);
+
+    print("Correct!");
 
     widget.onCorrectAnswer?.call();
   }
