@@ -74,7 +74,7 @@ class _WordAddViewState extends State<WordAddView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const ApplicationDrawer(),
+      drawer: ApplicationDrawer(),
       appBar: CommonAppBar.build(),
       body: Container(
         color: CommonColors.primaryBackgroundColor,

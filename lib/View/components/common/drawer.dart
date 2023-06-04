@@ -4,11 +4,19 @@ import 'package:word_book/View/card_manage.dart';
 import 'package:word_book/View/components/common/colors.dart';
 import 'package:word_book/View/flashcard.dart';
 
+import '../../Main.dart';
+
+class Observer {
+  static RouteObserver<PageRoute>? observer;
+}
+
 class ApplicationDrawer extends StatelessWidget {
-  const ApplicationDrawer({
+  ApplicationDrawer({
     super.key,
     this.onPageChanged,
-  });
+  }) {
+    if (Observer.observer == null) print("error");
+  }
 
   final Function? onPageChanged;
 
@@ -64,9 +72,12 @@ class ApplicationDrawer extends StatelessWidget {
             textColor: CommonColors.menuTextColor,
             onTap: () {
               _closeDrawer(context);
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => CardManageView()))
-                  .then((value) => onPageChanged?.call());
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                print(Observer.observer);
+                return CardManageView(
+                  routeObserver: Observer.observer!,
+                );
+              })).then((value) => onPageChanged?.call());
             },
           ),
         ],

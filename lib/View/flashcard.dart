@@ -123,7 +123,7 @@ class FlashcardViewState extends State<FlashcardView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const ApplicationDrawer(),
+      drawer: ApplicationDrawer(),
       appBar: CommonAppBar.build(),
       body: buildBody(context),
     );
@@ -252,8 +252,6 @@ class _TestableWordCardIndexState extends State<TestableWordCardIndex> with Sing
       end: CommonColors.secondaryBackgroundColor,
     ).animate(_animationController!);
     _animationController?.forward(from: 0.0);
-
-    print("Correct!");
 
     widget.onCorrectAnswer?.call();
   }

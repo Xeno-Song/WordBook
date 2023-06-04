@@ -15,9 +15,11 @@ import '../services/word_service.dart';
 import 'components/common/drawer.dart';
 
 class CardManageView extends StatefulWidget {
-  CardManageView({super.key, this.itemPerPage = 100});
+  CardManageView({super.key, this.itemPerPage = 100, required this.routeObserver});
 
   final int? itemPerPage;
+
+  final RouteObserver<PageRoute> routeObserver;
 
   @override
   State<StatefulWidget> createState() {
@@ -25,12 +27,13 @@ class CardManageView extends StatefulWidget {
   }
 }
 
-class _CardManageViewPageState extends State<CardManageView> {
+class _CardManageViewPageState extends State<CardManageView> with RouteAware {
   final WordService _service = WordService();
   int currentPage = 1;
   int maxPage = 1;
   int addRemaningWords = 0;
   ListingCondition _listingCondition = ListingCondition.createDateAsc;
+  bool _pageChanged = false;
 
   @override
   void initState() {
@@ -176,10 +179,25 @@ class _CardManageViewPageState extends State<CardManageView> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    widget.routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute<dynamic>);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_pageChanged == true) {
+      setState(() {
+        _pageChanged = false;
+        updateMaxPage();
+      });
+    }
+
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return Scaffold(
-        drawer: const ApplicationDrawer(),
+        drawer: ApplicationDrawer(
+          onPageChanged: () => _pageChanged = true,
+        ),
         appBar: CommonAppBar.build(
           <Widget>[
             PopupMenuButton<String>(
@@ -199,7 +217,11 @@ class _CardManageViewPageState extends State<CardManageView> {
             PopupMenuButton<String>(
               onSelected: (value) async {
                 if (value == 'Add') {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WordAddView()));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WordAddView())).then((_) {
+                    setState(() {
+                      _pageChanged = true;
+                    });
+                  });
                 } else if (value == 'Create Dummy') {
                   createDummyData(10000);
                 } else if (value == 'Load CSV') {

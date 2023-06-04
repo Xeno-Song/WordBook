@@ -17,10 +17,13 @@ import 'components/flip_number.dart';
 import 'flashcard.dart';
 
 class MainView extends StatefulWidget {
-  const MainView({
+  MainView({
     super.key,
     required this.routeObserver,
-  });
+  }) {
+    Observer.observer = routeObserver;
+    print(Observer.observer);
+  }
 
   final RouteObserver<PageRoute> routeObserver;
 
@@ -68,9 +71,11 @@ class _MainViewPageState extends State<MainView> with RouteAware {
     }
 
     return Scaffold(
-      drawer: ApplicationDrawer(onPageChanged: () {
-        setState(() => _pageChanged = true);
-      }),
+      drawer: ApplicationDrawer(
+        onPageChanged: () {
+          setState(() => _pageChanged = true);
+        },
+      ),
       appBar: CommonAppBar.build(
         <Widget>[
           IconButton(
@@ -237,7 +242,10 @@ class _MainViewPageState extends State<MainView> with RouteAware {
                                 elevation: 20,
                               ),
                               onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CardManageView()));
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (_) => CardManageView(
+                                          routeObserver: widget.routeObserver,
+                                        )));
                               },
                               child: Text(
                                 "Manage Words",
