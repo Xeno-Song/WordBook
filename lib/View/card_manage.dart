@@ -64,7 +64,7 @@ class _CardManageViewPageState extends State<CardManageView> with RouteAware {
 
   void onSelectedSortRuleChanged(ListingCondition? sortRule) {
     if (sortRule == null) return;
-    setState(() => _listingCondition = sortRule!);
+    setState(() => _listingCondition = sortRule);
   }
 
   void createDummyData(int dataCount) async {
@@ -276,7 +276,7 @@ class _CardManageViewPageState extends State<CardManageView> with RouteAware {
                               offset: (currentPage - 1) * 100,
                               count: 100,
                               onTrailingTap: handleWordItemTrailingMenuTap,
-                              data: snapshot.data!,
+                              data: snapshot.data! as List<WordModel>,
                             );
                           },
                         ),
@@ -465,7 +465,7 @@ class _CardManageItemBuilderState extends State<CardManageItemBuilder> {
                   child: Text('Delete'),
                 ),
               ],
-              onSelected: (value) => widget.onTrailingTap!(dataIndex, value),
+              onSelected: (value) => widget.onTrailingTap!(dataIndex, value as String),
             ),
           ),
         ),

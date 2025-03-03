@@ -82,12 +82,11 @@ class FlashcardViewState extends State<FlashcardView> {
       _service.updateTestResult(model.model);
     }
 
-    _service
-        .getNextWord(
+    _service.getNextWord(
       limit: 1,
       excludeId: List<int>.generate(_waitingWords.length, (index) => _waitingWords[index].model.id),
-    )
-        .then((word) {
+    ).then((word) {
+      if (word == null || word.isEmpty) return;
       _service.getRandomMeaningString(3, word![0]).then((value) {
         setState(() {
           _waitingWords.add(FlashcardObject(word[0], value));
@@ -155,7 +154,7 @@ class FlashcardViewState extends State<FlashcardView> {
           return false;
         },
         isDisabled: _waitingWords[0].testable && !_waitingWords[0].tested,
-        cardBuilder: (context, index) {
+        cardBuilder: (context, index, _1, _2) {
           if (index == 0) {
             return TestableWordCardIndex(
               dataObject: _waitingWords[index],
